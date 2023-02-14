@@ -1,13 +1,45 @@
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
+"use client";
+import React, { useEffect } from 'react';
 import styles from './page.module.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import { Stomp } from '@stomp/stompjs';
 
 export default function Home() {
+  const client = Stomp.client("ws://localhost:8080/websocket");
+
+  useEffect(() => {
+    const headers = {
+      login: 'Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzc3MiLCJleHAiOjE2NzYzODQ3NTR9.h_vJ16P83GiIwKnFz7Bn2YAedHMGPbmVSWptExw4OagtZCKUmNlRhX3BXUtusEPo',
+      // passcode: 'mypasscode',
+      // additional header
+      // 'client-id': 'my-client-id'
+    };
+
+    client.connect(headers, () => {
+      client.subscribe("/topic/messages", message => console.log(message));
+
+    });
+
+    client.activate();
+
+    client.subscribe("/topic/messages", message=> {
+      console.log(message)
+    })
+
+  }, [client])
+
+  function sendMessage() {
+    client.send("/app/messages", {
+      login: 'Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzc3MiLCJleHAiOjE2NzYzODQ3NTR9.h_vJ16P83GiIwKnFz7Bn2YAedHMGPbmVSWptExw4OagtZCKUmNlRhX3BXUtusEPo',
+      // passcode: 'mypasscode',
+      // additional header
+      // 'client-id': 'my-client-id'
+    }, JSON.stringify({ from: "ee", text: "Hello, STOMP" }));
+  }
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
+      <button onClick={sendMessage}>send message</button>
+      {/* <div className={styles.description}>
         <p>
           Get started by editing&nbsp;
           <code className={styles.code}>app/page.tsx</code>
@@ -85,7 +117,7 @@ export default function Home() {
             Instantly deploy your Next.js site to a shareable URL with Vercel.
           </p>
         </a>
-      </div>
+      </div> */}
     </main>
   )
 }
