@@ -1,123 +1,104 @@
-"use client";
-import React, { useEffect } from 'react';
+"use client"
+
+import Nodes from '@/components/Nodes';
+import Preview from '@/components/Preview';
+import Utils from '@/lib/utils';
+import { Scene } from '@babylonjs/core';
+import React, { useState } from 'react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import styles from './page.module.css'
-import { Stomp } from '@stomp/stompjs';
+
+let editorScene: Scene | null = null;
 
 export default function Home() {
-  const client = Stomp.client("ws://localhost:8080/websocket");
+  const [nodesCollapsed, setNodesCollapsed] = useState<boolean>(false);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState<boolean>(false);
+  const [assetsCollapsed, setAssetsCollapsed] = useState<boolean>(false);
+  const [sceneLoaded, setSceneLoaded] = useState<boolean>(false)
 
-  useEffect(() => {
-    const headers = {
-      login: 'Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzc3MiLCJleHAiOjE2NzYzODQ3NTR9.h_vJ16P83GiIwKnFz7Bn2YAedHMGPbmVSWptExw4OagtZCKUmNlRhX3BXUtusEPo',
-      // passcode: 'mypasscode',
-      // additional header
-      // 'client-id': 'my-client-id'
-    };
-
-    client.connect(headers, () => {
-      client.subscribe("/topic/messages", message => console.log(message));
-
-    });
-
-    client.activate();
-
-    client.subscribe("/topic/messages", message=> {
-      console.log(message)
-    })
-
-  }, [client])
-
-  function sendMessage() {
-    client.send("/app/messages", {
-      login: 'Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJzc3MiLCJleHAiOjE2NzYzODQ3NTR9.h_vJ16P83GiIwKnFz7Bn2YAedHMGPbmVSWptExw4OagtZCKUmNlRhX3BXUtusEPo',
-      // passcode: 'mypasscode',
-      // additional header
-      // 'client-id': 'my-client-id'
-    }, JSON.stringify({ from: "ee", text: "Hello, STOMP" }));
+  function toggleNodesCollapsed() {
+    setNodesCollapsed(!nodesCollapsed)
   }
+
+  function toggleInspectorCollapsed() {
+    setInspectorCollapsed(!inspectorCollapsed)
+  }
+
+  function onSceneMount(scene: Scene) {
+    editorScene = scene;
+    setSceneLoaded(true)
+  }
+
+  const onSceneResize = Utils.debounce(() => {
+    editorScene?.getEngine().resize()
+  }, 150)
 
   return (
     <main className={styles.main}>
-      <button onClick={sendMessage}>send message</button>
-      {/* <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+      <PanelGroup direction="horizontal">
+        <Panel
+          collapsible={true}
+          onResize={onSceneResize}
+          defaultSize={20}
+          maxSize={30}
+          minSize={15}
         >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
+          <Nodes loading={!sceneLoaded} scene={editorScene} />
+        </Panel>
+        <PanelResizeHandle className={
+          nodesCollapsed
+            ? styles.ResizeHandleCollapsed
+            : styles.ResizeHandle
+        } />
+        <Panel>
+          <PanelGroup direction="vertical">
+            <Panel
+              collapsible={true}
+              onResize={onSceneResize}
+              defaultSize={75}
+              maxSize={85}
+              minSize={50}
+            >
+              <Preview onSceneMount={onSceneMount} />
+            </Panel>
+            <PanelResizeHandle className={
+              assetsCollapsed
+                ? styles.VerticalResizeHandleCollapsed
+                : styles.VerticalResizeHandle
+            } />
+            <Panel>
+              <PanelGroup direction="horizontal">
+                <Panel
+                  collapsible={true}
+                  defaultSize={20}
+                  maxSize={30}
+                  minSize={10}
+                >
+                  资源
+                </Panel>
+                <PanelResizeHandle className={styles.ResizeHandle} />
+                <Panel>
+                  资源列表
+                </Panel>
+              </PanelGroup>
+            </Panel>
+          </PanelGroup>
+        </Panel>
+        <PanelResizeHandle className={
+          inspectorCollapsed
+            ? styles.ResizeHandleCollapsed
+            : styles.ResizeHandle
+        } />
+        <Panel
+          collapsible={true}
+          onResize={onSceneResize}
+          defaultSize={20}
+          maxSize={30}
+          minSize={15}
         >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div> */}
+          检查器
+        </Panel>
+      </PanelGroup>
     </main>
   )
 }

@@ -81,8 +81,9 @@
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
 body {
@@ -104,4 +105,18 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+@import "react-complex-tree/lib/style-modern.css";
+
+.rct-tree-item-title-container-selected .rct-tree-item-button {
+  background-color: var(--chakra-colors-gray-700);
+}
+
+.rct-tree-item-button:hover {
+  background-color: var(--chakra-colors-gray-700)!important;
+}
+
+.rct-tree-item-arrow-path {
+  fill: var(--chakra-colors-gray-300)
 }
