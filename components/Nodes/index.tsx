@@ -1,46 +1,75 @@
 "use client"
 
-import { Scene } from "@babylonjs/core";
+import { IEditor } from "@/app/page";
 import { Box } from "@chakra-ui/react";
+import { PureComponent, ReactNode } from "react";
 import {
-  UncontrolledTreeEnvironment,
   Tree,
-  StaticTreeDataProvider
+  ControlledTreeEnvironment,
+  TreeItemIndex
 } from "react-complex-tree";
 import PanelHeader from "../PanelHeader";
-import { longTree } from "./data";
+import { longTree, shortTree } from "./data";
 
-function Nodes({
-  loading,
-  scene,
-}: {
-  loading: boolean;
-  scene: Scene | null;
-}) {
-  console.log(scene?.rootNodes)
-  if (loading) { return null; }
-
-  return (
-    <Box>
-      <PanelHeader title="层级" />
-      <UncontrolledTreeEnvironment
-        dataProvider={
-          new StaticTreeDataProvider(longTree.items, (item, data) => ({
-            ...item,
-            data
-          }))
-        }
-        getItemTitle={(item) => item.data}
-        viewState={{
-          "tree-1": {
-            expandedItems: ["Fruit"]
-          }
-        }}
-      >
-        <Tree treeId="tree-1" rootItem="root" treeLabel="Tree Example" />
-      </UncontrolledTreeEnvironment>
-    </Box>
-  )
+type INodesProps = {
+  editor: IEditor;
 }
 
-export default Nodes;
+type INodesState = {
+  focusedItem: TreeItemIndex | undefined;
+  expandedItems: TreeItemIndex[];
+  selectedItems: TreeItemIndex[];
+}
+
+export default class Nodes extends PureComponent<INodesProps, INodesState> {
+  constructor(props: INodesProps) {
+    super(props);
+
+    this.state = {
+      focusedItem: undefined,
+      expandedItems: [],
+      selectedItems: []
+    }
+  }
+
+  public setFocusedItem(item: TreeItemIndex) {
+    this.setState({ focusedItem: item });
+  }
+
+  public setExpandedItems(items: TreeItemIndex[]) {
+    this.setState({ expandedItems: items })
+  }
+
+  public setSelectedItems(items: TreeItemIndex[]) {
+    this.setState({ selectedItems: items })
+  }
+
+  render(): ReactNode {
+    console.log(this.props.editor)
+    const { focusedItem, expandedItems, selectedItems } = this.state;
+    return (
+      <Box>
+        <PanelHeader title="层级" />
+        <ControlledTreeEnvironment
+          items={longTree.items}
+          getItemTitle={item => item.data}
+          viewState={{
+            ['tree-nodes']: {
+              focusedItem,
+              expandedItems,
+              selectedItems,
+            },
+          }}
+          onFocusItem={item => this.setFocusedItem(item.index)}
+          onExpandItem={item => this.setExpandedItems([...expandedItems, item.index])}
+          onCollapseItem={item =>
+            this.setExpandedItems(expandedItems.filter(expandedItemIndex => expandedItemIndex !== item.index))
+          }
+          onSelectItems={items => this.setSelectedItems(items)}
+        >
+          <Tree treeId="tree-nodes" rootItem="root" treeLabel="Nodes" />
+        </ControlledTreeEnvironment>
+      </Box >
+    )
+  }
+}

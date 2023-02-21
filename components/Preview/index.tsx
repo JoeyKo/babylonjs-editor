@@ -1,32 +1,37 @@
 "use client";
-import { useEffect, useRef } from "react"
+import { createRef, PureComponent, ReactNode, useEffect, useRef } from "react"
 import { Engine, Scene, FreeCamera, HemisphericLight, Vector3, CreateSphere } from '@babylonjs/core';
 import styles from './index.module.scss';
+import { IEditor } from "@/app/page";
 
-function Preview({
-  onSceneMount
-}: {
-  onSceneMount: (scene: Scene) => void
-}) {
-  const renderCanvas = useRef<HTMLCanvasElement>(null);
-  let { current: editorEngine } = useRef<Engine>(null);
+type IPreviewProps = {
+  editor: IEditor;
+  onSceneMount: (scene: Scene) => void;
+}
 
-  useEffect(() => {
+type IPreviewStates = {
+
+}
+
+export default class Preview extends PureComponent<IPreviewProps, IPreviewStates> {
+  public renderCanvas = createRef<HTMLCanvasElement>();
+
+  constructor(props: IPreviewProps) {
+    super(props)
+  }
+
+  componentDidMount() {
     setTimeout(() => {
-      init();
+      this.init();
     }, 0);
+  }
 
-    return () => {
-      window.removeEventListener("resize", () => editorEngine?.resize());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  public init() {
+    console.log(this.props.editor.scene)
+    if (this.props.editor.scene) { return; }
 
-  function init() {
-    if (editorEngine) { return; }
-    
     // Associate a Babylon Engine to it.
-    const engine = new Engine(renderCanvas.current);
+    const engine = new Engine(this.renderCanvas.current);
 
     window.addEventListener("resize", () => {
       engine?.resize()
@@ -42,7 +47,7 @@ function Preview({
     camera.setTarget(Vector3.Zero());
 
     // This attaches the camera to the canvas
-    camera.attachControl(renderCanvas.current, true);
+    camera.attachControl(this.renderCanvas.current, true);
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
@@ -56,19 +61,18 @@ function Preview({
     // Move the sphere upward 1/2 its height
     sphere.position.y = 2;
 
-    onSceneMount(scene);
+    this.props.onSceneMount(scene);
 
     // Render every frame
     scene.getEngine().runRenderLoop(() => {
       scene.render();
     });
-
-    editorEngine = engine;
   }
 
-  return (
-    <canvas ref={renderCanvas} className={styles.renderCanvas}></canvas>
-  )
-}
+  render(): ReactNode {
 
-export default Preview;
+    return (
+      <canvas ref={this.renderCanvas} className={styles.renderCanvas}></canvas>
+    )
+  }
+}

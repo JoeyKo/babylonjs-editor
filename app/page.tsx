@@ -2,103 +2,126 @@
 
 import Nodes from '@/components/Nodes';
 import Preview from '@/components/Preview';
-import Utils from '@/lib/utils';
-import { Scene } from '@babylonjs/core';
-import React, { useState } from 'react';
+import { Nullable, Scene } from '@babylonjs/core';
+import React, { Component, PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import styles from './page.module.css'
 
-let editorScene: Scene | null = null;
+type IEditorStates = {
+  nodesCollapsed: boolean;
+  inspectorCollapsed: boolean;
+  assetsCollapsed: boolean;
+  engineLoaded: boolean;
+}
 
-export default function Home() {
-  const [nodesCollapsed, setNodesCollapsed] = useState<boolean>(false);
-  const [inspectorCollapsed, setInspectorCollapsed] = useState<boolean>(false);
-  const [assetsCollapsed, setAssetsCollapsed] = useState<boolean>(false);
-  const [sceneLoaded, setSceneLoaded] = useState<boolean>(false)
+type IEditorProps = {
 
-  function toggleNodesCollapsed() {
-    setNodesCollapsed(!nodesCollapsed)
+}
+
+export type IEditor = {
+  scene: Nullable<Scene>;
+}
+
+export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
+  public scene: Nullable<Scene> = null;
+
+  constructor(props: IEditorProps) {
+    super(props);
+
+    this.state = {
+      nodesCollapsed: false,
+      inspectorCollapsed: false,
+      assetsCollapsed: false,
+      engineLoaded: false,
+    }
   }
 
-  function toggleInspectorCollapsed() {
-    setInspectorCollapsed(!inspectorCollapsed)
+  public toggleNodesCollapsed() {
+    this.setState({ nodesCollapsed: !this.state.nodesCollapsed })
   }
 
-  function onSceneMount(scene: Scene) {
-    editorScene = scene;
-    setSceneLoaded(true)
+  public toggleInspectorCollapsed() {
+    this.setState({ inspectorCollapsed: !this.state.inspectorCollapsed })
   }
 
-  const onSceneResize = Utils.debounce(() => {
-    editorScene?.getEngine().resize()
-  }, 150)
+  public onSceneMount = (scene: Scene) => {
+    this.scene = scene;
+    this.setState({ engineLoaded: true })
+  }
 
-  return (
-    <main className={styles.main}>
-      <PanelGroup direction="horizontal">
-        <Panel
-          collapsible={true}
-          onResize={onSceneResize}
-          defaultSize={20}
-          maxSize={30}
-          minSize={15}
-        >
-          <Nodes loading={!sceneLoaded} scene={editorScene} />
-        </Panel>
-        <PanelResizeHandle className={
-          nodesCollapsed
-            ? styles.ResizeHandleCollapsed
-            : styles.ResizeHandle
-        } />
-        <Panel>
-          <PanelGroup direction="vertical">
-            <Panel
-              collapsible={true}
-              onResize={onSceneResize}
-              defaultSize={75}
-              maxSize={85}
-              minSize={50}
-            >
-              <Preview onSceneMount={onSceneMount} />
-            </Panel>
-            <PanelResizeHandle className={
-              assetsCollapsed
-                ? styles.VerticalResizeHandleCollapsed
-                : styles.VerticalResizeHandle
-            } />
-            <Panel>
-              <PanelGroup direction="horizontal">
-                <Panel
-                  collapsible={true}
-                  defaultSize={20}
-                  maxSize={30}
-                  minSize={10}
-                >
-                  资源
-                </Panel>
-                <PanelResizeHandle className={styles.ResizeHandle} />
-                <Panel>
-                  资源列表
-                </Panel>
-              </PanelGroup>
-            </Panel>
-          </PanelGroup>
-        </Panel>
-        <PanelResizeHandle className={
-          inspectorCollapsed
-            ? styles.ResizeHandleCollapsed
-            : styles.ResizeHandle
-        } />
-        <Panel
-          collapsible={true}
-          onResize={onSceneResize}
-          defaultSize={20}
-          maxSize={30}
-          minSize={15}
-        >
-          检查器
-        </Panel>
-      </PanelGroup>
-    </main>
-  )
+  public resize = () => {
+    this.scene?.getEngine().resize()
+  }
+
+  render(): React.ReactNode {
+    const { nodesCollapsed, inspectorCollapsed, assetsCollapsed, engineLoaded } = this.state;
+    return (
+      <main className={styles.main} >
+        <PanelGroup direction="horizontal">
+          <Panel
+            collapsible={true}
+            onResize={this.resize}
+            defaultSize={20}
+            maxSize={30}
+            minSize={15}
+          >
+            <Nodes editor={this} />
+          </Panel>
+          <PanelResizeHandle className={
+            nodesCollapsed
+              ? styles.ResizeHandleCollapsed
+              : styles.ResizeHandle
+          } />
+          <Panel>
+            <PanelGroup direction="vertical">
+              <Panel
+                collapsible={true}
+                onResize={this.resize}
+                defaultSize={75}
+                maxSize={85}
+                minSize={50}
+              >
+                <Preview editor={this} onSceneMount={this.onSceneMount} />
+              </Panel>
+              <PanelResizeHandle className={
+                assetsCollapsed
+                  ? styles.VerticalResizeHandleCollapsed
+                  : styles.VerticalResizeHandle
+              } />
+              <Panel>
+                <PanelGroup direction="horizontal">
+                  <Panel
+                    collapsible={true}
+                    defaultSize={20}
+                    maxSize={30}
+                    minSize={10}
+                  >
+                    资源
+                  </Panel>
+                  <PanelResizeHandle className={styles.ResizeHandle} />
+                  <Panel>
+                    资源列表
+                  </Panel>
+                </PanelGroup>
+              </Panel>
+            </PanelGroup>
+          </Panel>
+          <PanelResizeHandle className={
+            inspectorCollapsed
+              ? styles.ResizeHandleCollapsed
+              : styles.ResizeHandle
+          } />
+          <Panel
+            collapsible={true}
+            onResize={this.resize}
+            defaultSize={20}
+            maxSize={30}
+            minSize={15}
+          >
+            检查器
+          </Panel>
+        </PanelGroup>
+      </main>
+    )
+  }
 }

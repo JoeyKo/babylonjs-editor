@@ -109,12 +109,19 @@ a {
 
 @import "react-complex-tree/lib/style-modern.css";
 
-.rct-tree-item-title-container-selected .rct-tree-item-button {
-  background-color: var(--chakra-colors-gray-700);
+.rct-tree-item-button {
+  color: var(--chakra-colors-gray-300);
 }
 
-.rct-tree-item-button:hover {
-  background-color: var(--chakra-colors-gray-700)!important;
+.rct-tree-item-title-container-selected .rct-tree-item-button {
+  background-color: var(--chakra-colors-gray-700);
+  color: var(--chakra-colors-gray-300);
+}
+
+.rct-tree-item-button:hover,
+.rct-tree-item-arrow.rct-tree-item-arrow-isFolder:hover {
+  background-color: var(--chakra-colors-gray-700);
+  color: var(--chakra-colors-gray-300);
 }
 
 .rct-tree-item-arrow-path {
