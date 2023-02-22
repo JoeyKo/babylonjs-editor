@@ -1,11 +1,17 @@
 class Utils {
-  static debounce = (fn: Function, ms = 300) => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    return function (this: any, ...args: any[]) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => fn.apply(this, args), ms);
-    };
-  };
+  /**
+   * Returns the name of the constructor of the given object.
+   * @param object the object to return its constructor name.
+   */
+  public static GetConstructorName(object: any): string {
+    let name = (object && object.constructor) ? object.constructor.name : "";
+
+    if (name === "") {
+      name = typeof (object);
+    }
+
+    return name;
+  }
 }
 
 export default Utils;
