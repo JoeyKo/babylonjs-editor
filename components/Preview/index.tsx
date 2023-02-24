@@ -27,7 +27,6 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
   }
 
   public init() {
-    console.log(this.props.editor.scene)
     if (this.props.editor.scene) { return; }
 
     // Associate a Babylon Engine to it.

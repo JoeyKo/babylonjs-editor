@@ -45,7 +45,6 @@ export default class Nodes extends PureComponent<INodesProps, INodesState> {
   }
 
   render(): ReactNode {
-    console.log(this.props.editor)
     const { focusedItem, expandedItems, selectedItems } = this.state;
     return (
       <Box>

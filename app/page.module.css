@@ -1,14 +1,14 @@
 .main {
   width: 100vw;
   height: 100vh;
-  background-color: var(--chakra-colors-gray-800);
+  /* background-color: var(--chakra-colors-gray-800); */
 }
 
 .ResizeHandle,
 .VerticalResizeHandle,
 .ResizeHandleCollapsed .VerticalResizeHandleCollapsed {
   transition: 250ms linear background-color;
-  background-color: var(--chakra-colors-gray-800);
+  /* background-color: var(--chakra-colors-gray-800); */
   outline: none;
 }
 

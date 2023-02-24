@@ -1,14 +1,21 @@
 import { Scene } from "@babylonjs/core";
 import { PureComponent, ReactNode } from "react";
 import { AbstractInspector } from "../AbstractInspector";
-import InspectorNumber from "../Fields/InspectorNumber";
+import InspectorNumber from "../../../gui/inspector/fields/InspectorNumber";
 import { IScriptInspectorState, ScriptInspector } from "../Script/ScriptInspector";
+import { Inspector } from "../Inspector";
 
 export class SceneInspector extends ScriptInspector<Scene, IScriptInspectorState>  {
 
-  render(): ReactNode {
+  public renderContent(): ReactNode {
     return (
       <InspectorNumber />
     )
   }
 }
+
+Inspector.RegisterObjectInspector({
+  ctor: SceneInspector,
+  ctorNames: ["Scene"],
+  title: "Scene",
+});

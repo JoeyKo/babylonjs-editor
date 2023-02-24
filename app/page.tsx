@@ -1,11 +1,15 @@
 "use client"
 
+import { Inspector } from '@/components/Inspectors/Inspector';
 import Nodes from '@/components/Nodes';
 import Preview from '@/components/Preview';
-import { Nullable, Scene } from '@babylonjs/core';
-import React, { Component, PureComponent } from 'react';
+import { Nullable, Observable, Scene } from '@babylonjs/core';
+import React, { PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import styles from './page.module.css'
+
+// Inspector
+import '@/components/Inspectors/Scene/SceneInspector';
 
 type IEditorStates = {
   nodesCollapsed: boolean;
@@ -24,6 +28,8 @@ export type IEditor = {
 
 export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
   public scene: Nullable<Scene> = null;
+  public inspector: Nullable<Inspector> = null;
+  public selectedSceneObservable: Observable<Scene> = new Observable<Scene>();
 
   constructor(props: IEditorProps) {
     super(props);
@@ -46,11 +52,19 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
 
   public onSceneMount = (scene: Scene) => {
     this.scene = scene;
-    this.setState({ engineLoaded: true })
+    this.setState({ engineLoaded: true });
+
+    this._bindEvents();
+
+    this.selectedSceneObservable.notifyObservers(this.scene!);
   }
 
   public resize = () => {
     this.scene?.getEngine().resize()
+  }
+
+  private _bindEvents(): void {
+    this.selectedSceneObservable.add((s) => this.inspector?.setSelectedObject(s));
   }
 
   render(): React.ReactNode {
@@ -65,7 +79,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
             maxSize={30}
             minSize={15}
           >
-            <Nodes editor={this} />
+            {this.state.engineLoaded ? <Nodes editor={this} /> : null}
           </Panel>
           <PanelResizeHandle className={
             nodesCollapsed
@@ -118,7 +132,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
             maxSize={30}
             minSize={15}
           >
-            检查器
+            <Inspector editor={this} />
           </Panel>
         </PanelGroup>
       </main>
