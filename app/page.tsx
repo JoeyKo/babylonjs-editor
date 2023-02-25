@@ -10,6 +10,7 @@ import styles from './page.module.css'
 
 // Inspector
 import '@/components/Inspectors/Scene/SceneInspector';
+import Assets from '@/components/Assets';
 
 type IEditorStates = {
   nodesCollapsed: boolean;
@@ -103,20 +104,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
                   : styles.VerticalResizeHandle
               } />
               <Panel>
-                <PanelGroup direction="horizontal">
-                  <Panel
-                    collapsible={true}
-                    defaultSize={20}
-                    maxSize={30}
-                    minSize={10}
-                  >
-                    资源
-                  </Panel>
-                  <PanelResizeHandle className={styles.ResizeHandle} />
-                  <Panel>
-                    资源列表
-                  </Panel>
-                </PanelGroup>
+                <Assets editor={this} />
               </Panel>
             </PanelGroup>
           </Panel>

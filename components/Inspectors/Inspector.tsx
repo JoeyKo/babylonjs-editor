@@ -3,8 +3,9 @@ import InspectorUtils from "@/gui/inspector/utils";
 import { Undefinable } from "@/lib/types";
 import Utils from "@/lib/utils";
 import { Scene, Tools } from "@babylonjs/core";
-import { Box } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 import React from "react";
+import PanelHeader from "../PanelHeader";
 import { AbstractInspector } from "./AbstractInspector";
 
 export interface IObjectInspector {
@@ -109,7 +110,10 @@ export class Inspector extends React.PureComponent<IInspectorProps, IInspectorSt
   render(): React.ReactNode {
     if (!this.state.selectedObject) {
       return (
-        <Box>没有选中的物体</Box>
+        <Box>
+          <PanelHeader title="检查器" />
+          <Heading p={2} textAlign="center" as="p" fontSize="xs">没有选中的物体</Heading>
+        </Box>
       );
     }
 
@@ -131,7 +135,12 @@ export class Inspector extends React.PureComponent<IInspectorProps, IInspectorSt
       objectInspector = <i.ctor key={`${key.toString()}_${this._forceUpdateId}_${Tools.RandomId()}`} editor={this._editor} _objectRef={this.state.selectedObject} toolId={i._id!} ref={this._refHandler.getInspector} />
     });
 
-    return objectInspector
+    return (
+      <Box>
+        <PanelHeader title="检查器" />
+        {objectInspector}
+      </Box>
+    )
   }
 
   /**
