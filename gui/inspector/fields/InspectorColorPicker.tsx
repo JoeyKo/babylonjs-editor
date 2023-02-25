@@ -179,7 +179,6 @@ export class InspectorColorPicker extends React.Component<IInspectorColorPickerP
    * Returns the text color according to the current HSV values.
    */
   private _getTextColor(hsvColor: Color3): string {
-    console.log(hsvColor)
     return (hsvColor.b < 0.5 || hsvColor.g > 0.5) ? "white" : "black";
   }
 

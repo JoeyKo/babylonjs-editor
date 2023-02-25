@@ -28,6 +28,6 @@ export class SceneInspector extends ScriptInspector<Scene, IScriptInspectorState
 
 Inspector.RegisterObjectInspector({
   ctor: SceneInspector,
-  ctorNames: ["Scene"],
+  ctorNames: [Scene.name],
   title: "Scene",
 });
