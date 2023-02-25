@@ -1,6 +1,5 @@
 "use client"
 
-import { IEditor } from "@/app/page";
 import { Box } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import {
@@ -11,7 +10,8 @@ import {
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { shortTree } from "../Nodes/data";
 import PanelHeader from "../PanelHeader";
-import appStyles from '../../app/page.module.css'
+import styles from './index.module.css'
+import { IEditor } from "../Editor";
 
 type INodesProps = {
   editor: IEditor;
@@ -78,7 +78,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
               <Tree treeId="tree-assets" rootItem="root" treeLabel="Assets" />
             </ControlledTreeEnvironment>
           </Panel>
-          <PanelResizeHandle className={appStyles.ResizeHandle} />
+          <PanelResizeHandle className={styles.ResizeHandle} />
           <Panel>
 
           </Panel>

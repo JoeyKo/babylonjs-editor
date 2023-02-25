@@ -1,6 +1,5 @@
 import { Scene } from "@babylonjs/core";
 import { ReactNode } from "react";
-import { AbstractInspector } from "../AbstractInspector";
 import InspectorNumber from "../../../gui/inspector/fields/InspectorNumber";
 import { IScriptInspectorState, ScriptInspector } from "../Script/ScriptInspector";
 import { Inspector } from "../Inspector";

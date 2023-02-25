@@ -1,6 +1,5 @@
 "use client"
 
-import { IEditor } from "@/app/page";
 import { Box } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import {
@@ -8,6 +7,7 @@ import {
   ControlledTreeEnvironment,
   TreeItemIndex
 } from "react-complex-tree";
+import { IEditor } from "../Editor";
 import PanelHeader from "../PanelHeader";
 import { longTree, shortTree } from "./data";
 

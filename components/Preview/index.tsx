@@ -1,8 +1,8 @@
 "use client";
-import { createRef, PureComponent, ReactNode, useEffect, useRef } from "react"
+import { createRef, PureComponent, ReactNode } from "react"
 import { Engine, Scene, FreeCamera, HemisphericLight, Vector3, CreateSphere, ParticleSystem, Texture, Color4 } from '@babylonjs/core';
 import styles from './index.module.scss';
-import { IEditor } from "@/app/page";
+import { IEditor } from "../Editor";
 
 type IPreviewProps = {
   editor: IEditor;

@@ -1,7 +1,7 @@
-import Editor from "@/app/page";
 import InspectorUtils from "@/gui/inspector/utils";
 import { Nullable } from "@babylonjs/core";
 import React from "react";
+import Editor from "../Editor";
 import { IObjectInspectorProps } from "./Inspector";
 
 export abstract class AbstractInspector<T, S> extends React.Component<IObjectInspectorProps, S> {

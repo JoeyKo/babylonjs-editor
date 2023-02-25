@@ -1,10 +1,9 @@
-import Editor from "@/app/page";
-import InspectorUtils from "@/gui/inspector/utils";
 import { Undefinable } from "@/lib/types";
 import Utils from "@/lib/utils";
 import { Scene, Tools } from "@babylonjs/core";
 import { Box, Heading } from "@chakra-ui/react";
 import React from "react";
+import Editor from "../Editor";
 import PanelHeader from "../PanelHeader";
 import { AbstractInspector } from "./AbstractInspector";
 
