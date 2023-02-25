@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Box, Heading, HStack, Icon } from "@chakra-ui/react";
+import { Box, Collapse, Fade, Heading, HStack, Icon, Stack } from "@chakra-ui/react";
 import { Nullable } from "@/lib/types";
 import InspectorUtils from "../utils";
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
@@ -66,12 +66,14 @@ export class InspectorSection extends React.Component<IInspectorSectionProps, II
           <Icon fontSize={"sm"} as={this.state.collapsed ? IoIosArrowForward : IoIosArrowDown} />
           <Heading
             as="h4"
-            fontSize="xs"
+            fontSize="sm"
           >
             {this.props.title}
           </Heading>
         </HStack>
-        {this.state.collapsed ? undefined : <Box pt={1.5} px={2}>{children}</Box>}
+        <Fade in={!this.state.collapsed}>
+          <Stack pt={1.5} spacing={1.5} px={2}>{children}</Stack>
+        </Fade>
       </Box>
     );
   }

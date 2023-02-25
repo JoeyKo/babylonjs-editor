@@ -50,14 +50,14 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
     const { focusedItem, expandedItems, selectedItems } = this.state;
     return (
       <Box h="100%">
+        <PanelHeader title="资源" />
         <PanelGroup direction="horizontal">
           <Panel
-            collapsible={true}
-            defaultSize={20}
+            collapsible={false}
+            defaultSize={18}
             maxSize={30}
-            minSize={10}
+            minSize={12}
           >
-            <PanelHeader title="资源" />
             <ControlledTreeEnvironment
               items={shortTree.items}
               getItemTitle={item => item.data}

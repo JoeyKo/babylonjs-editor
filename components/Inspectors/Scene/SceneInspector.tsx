@@ -7,6 +7,7 @@ import { Inspector } from "../Inspector";
 import { InspectorSection } from "@/gui/inspector/fields/InspectorSection";
 import { Box, Stack } from "@chakra-ui/react";
 import InspectorInput from "@/gui/inspector/fields/InspectorInput";
+import { InspectorColorPicker } from "@/gui/inspector/fields/InspectorColorPicker";
 
 export class SceneInspector extends ScriptInspector<Scene, IScriptInspectorState>  {
 
@@ -17,7 +18,9 @@ export class SceneInspector extends ScriptInspector<Scene, IScriptInspectorState
           <InspectorInput label="场景名" />
         </Box>
         <InspectorSection title={"渲染"}>
-          <InspectorNumber label="最大灯光数量" />
+          <InspectorColorPicker object={this.selectedObject} property={"clearColor"} label={"背景色"} />
+          <InspectorColorPicker object={this.selectedObject} property="ambientColor" label="环境色" />
+          <InspectorNumber label="最大灯光数" />
         </InspectorSection>
       </Stack>
     )

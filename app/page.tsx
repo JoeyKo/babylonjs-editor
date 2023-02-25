@@ -11,6 +11,7 @@ import styles from './page.module.css'
 // Inspector
 import '@/components/Inspectors/Scene/SceneInspector';
 import Assets from '@/components/Assets';
+import { Box, Fade, Flex, Heading, HStack, Spinner, Stack } from '@chakra-ui/react';
 
 type IEditorStates = {
   nodesCollapsed: boolean;
@@ -70,60 +71,80 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
 
   render(): React.ReactNode {
     const { nodesCollapsed, inspectorCollapsed, assetsCollapsed, engineLoaded } = this.state;
+
     return (
-      <main className={styles.main} >
-        <PanelGroup direction="horizontal">
-          <Panel
-            collapsible={true}
-            onResize={this.resize}
-            defaultSize={20}
-            maxSize={30}
-            minSize={15}
-          >
-            {this.state.engineLoaded ? <Nodes editor={this} /> : null}
-          </Panel>
-          <PanelResizeHandle className={
-            nodesCollapsed
-              ? styles.ResizeHandleCollapsed
-              : styles.ResizeHandle
-          } />
-          <Panel>
-            <PanelGroup direction="vertical">
-              <Panel
-                collapsible={true}
-                onResize={this.resize}
-                defaultSize={75}
-                maxSize={85}
-                minSize={50}
-              >
-                <Preview editor={this} onSceneMount={this.onSceneMount} />
-              </Panel>
-              <PanelResizeHandle className={
-                assetsCollapsed
-                  ? styles.VerticalResizeHandleCollapsed
-                  : styles.VerticalResizeHandle
-              } />
-              <Panel>
-                <Assets editor={this} />
-              </Panel>
-            </PanelGroup>
-          </Panel>
-          <PanelResizeHandle className={
-            inspectorCollapsed
-              ? styles.ResizeHandleCollapsed
-              : styles.ResizeHandle
-          } />
-          <Panel
-            collapsible={true}
-            onResize={this.resize}
-            defaultSize={20}
-            maxSize={30}
-            minSize={15}
-          >
-            <Inspector editor={this} />
-          </Panel>
-        </PanelGroup>
-      </main>
+      <>
+        <Flex
+          pos="fixed"
+          left={0}
+          top={0}
+          w="100vw"
+          h="200vh"
+          color="gray.100"
+          bg="gray.700"
+          zIndex={999}
+          overflow="hide"
+          hidden={engineLoaded}
+        >
+          <HStack spacing={2} w="100vw" h="100vh" justify="center">
+            <Spinner size="sm" />
+            <Heading as="p" fontSize="md">编辑器初始化中...</Heading>
+          </HStack>
+        </Flex>
+        <main className={styles.main}>
+          <PanelGroup direction="horizontal">
+            <Panel
+              collapsible={true}
+              onResize={this.resize}
+              defaultSize={20}
+              maxSize={30}
+              minSize={15}
+            >
+              {engineLoaded ? <Nodes editor={this} /> : null}
+            </Panel>
+            <PanelResizeHandle className={
+              nodesCollapsed
+                ? styles.ResizeHandleCollapsed
+                : styles.ResizeHandle
+            } />
+            <Panel>
+              <PanelGroup direction="vertical">
+                <Panel
+                  collapsible={false}
+                  onResize={this.resize}
+                  defaultSize={75}
+                  maxSize={85}
+                  minSize={50}
+                >
+                  <Preview editor={this} onSceneMount={this.onSceneMount} />
+                </Panel>
+                <PanelResizeHandle className={
+                  assetsCollapsed
+                    ? styles.VerticalResizeHandleCollapsed
+                    : styles.VerticalResizeHandle
+                } />
+                <Panel>
+                  {engineLoaded ? <Assets editor={this} /> : null}
+                </Panel>
+              </PanelGroup>
+            </Panel>
+            <PanelResizeHandle className={
+              inspectorCollapsed
+                ? styles.ResizeHandleCollapsed
+                : styles.ResizeHandle
+            } />
+            <Panel
+              collapsible={false}
+              onResize={this.resize}
+              defaultSize={20}
+              maxSize={30}
+              minSize={15}
+            >
+              <Inspector editor={this} />
+            </Panel>
+          </PanelGroup>
+        </main>
+      </>
     )
   }
 }

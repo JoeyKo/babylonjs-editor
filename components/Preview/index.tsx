@@ -1,6 +1,6 @@
 "use client";
 import { createRef, PureComponent, ReactNode, useEffect, useRef } from "react"
-import { Engine, Scene, FreeCamera, HemisphericLight, Vector3, CreateSphere } from '@babylonjs/core';
+import { Engine, Scene, FreeCamera, HemisphericLight, Vector3, CreateSphere, ParticleSystem, Texture, Color4 } from '@babylonjs/core';
 import styles from './index.module.scss';
 import { IEditor } from "@/app/page";
 
@@ -59,7 +59,7 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
 
     // Move the sphere upward 1/2 its height
     sphere.position.y = 2;
-
+ 
     this.props.onSceneMount(scene);
 
     // Render every frame
