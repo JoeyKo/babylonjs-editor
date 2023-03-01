@@ -4,7 +4,7 @@ import { Flex, Heading, HStack, Spinner } from '@chakra-ui/react';
 import { Inspector } from '@/components/Inspectors/Inspector';
 import Nodes from '@/components/Nodes';
 import Preview from '@/components/Preview';
-import { Engine, HemisphericLight, Nullable, Observable, Scene, Vector3 } from '@babylonjs/core';
+import { Engine, HemisphericLight, MeshBuilder, Nullable, Observable, Scene, Vector3 } from '@babylonjs/core';
 import React, { PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Assets from '@/components/Assets';
@@ -24,18 +24,12 @@ type IEditorProps = {
 
 }
 
-export type IEditor = {
-  scene: Nullable<Scene>;
-  inspector: Nullable<Inspector>;
-  assetScene: Nullable<Scene>
-}
-
 export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
   public scene: Nullable<Scene> = null;
   public inspector: Nullable<Inspector> = null;
   public selectedSceneObservable: Observable<Scene> = new Observable<Scene>();
   // Asset engine for multiple scenes
-  public assetScene: Nullable<Scene> = null;
+  public assetRenderEngine: Nullable<Engine> = null;
 
   constructor(props: IEditorProps) {
     super(props);
@@ -56,26 +50,15 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
     this.setState({ inspectorCollapsed: !this.state.inspectorCollapsed })
   }
 
-  public createAssetScene() {
-    const engine = new Engine(document.createElement("canvas"), true);
-    const scene = new Scene(engine);
-    const light = new HemisphericLight("Asset Scene Light", new Vector3(0, 1, 0), scene);
-    light.intensity = 0.7;
-
-    engine.runRenderLoop(() => {
-      if (scene.activeCamera) {
-        scene.render()
-      }
-    })
-
-    return scene;
+  public createAssetRenderEngine() {
+    return new Engine(document.createElement("canvas"), true);
   }
 
   public onSceneMount = (scene: Scene) => {
     this.scene = scene;
     this.setState({ engineLoaded: true });
 
-    this.assetScene = this.createAssetScene();
+    this.assetRenderEngine = this.createAssetRenderEngine();
 
     this._bindEvents();
 

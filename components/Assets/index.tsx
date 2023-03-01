@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, SimpleGrid, Wrap, WrapItem } from "@chakra-ui/react";
+import { Box, Wrap, WrapItem } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import {
   Tree,
@@ -8,30 +8,34 @@ import {
   TreeItemIndex
 } from "react-complex-tree";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import Editor from "../Editor";
 import { shortTree } from "../Nodes/data";
 import PanelHeader from "../PanelHeader";
-import styles from './index.module.css'
-import { IEditor } from "../Editor";
 import RenderCanvas from "./RenderCanvas";
+import styles from './index.module.css'
+import { Color4, Scene } from "@babylonjs/core";
 
 type INodesProps = {
-  editor: IEditor;
+  editor: Editor;
 }
 
 type INodesState = {
   focusedItem: TreeItemIndex | undefined;
   expandedItems: TreeItemIndex[];
   selectedItems: TreeItemIndex[];
+  assets: any[];
 }
 
 export default class Assets extends PureComponent<INodesProps, INodesState> {
+  public sceneInstances: { [key: string]: Scene } = {};
   constructor(props: INodesProps) {
     super(props);
 
     this.state = {
       focusedItem: undefined,
       expandedItems: [],
-      selectedItems: []
+      selectedItems: [],
+      assets: [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }, { id: "5" }, { id: "6" }]
     }
   }
 
@@ -45,6 +49,19 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
 
   public setSelectedItems(items: TreeItemIndex[]) {
     this.setState({ selectedItems: items })
+  }
+
+  // Store each asset scene with id.
+  public onSceneMount(id: string, scene: Scene) {
+    this.sceneInstances[id] = scene;
+  }
+
+  // Update asset scene property
+  public onAssetClick(id: string) {
+    const scene = this.sceneInstances[id];
+    if (scene) {
+      scene.clearColor = Color4.FromHexString("#ddd333")
+    }
   }
 
   render(): ReactNode {
@@ -85,13 +102,14 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
           <Panel>
             <Box height="calc(100% - 32px)" overflow={"auto"}>
               <Wrap p={2} spacing={2}>
-                {
-                  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((id: number) => (
-                    <WrapItem key={id} alignItems="center" justifyContent="center" w="100px" height="100px">
-                      <RenderCanvas scene={this.props.editor.assetScene} />
-                    </WrapItem>
-                  ))
-                }
+                {this.state.assets.map(asset => (
+                  <WrapItem onClick={() => this.onAssetClick(asset.id)} key={asset.id} alignItems="center" justifyContent="center" w="100px" height="100px">
+                    <RenderCanvas
+                      editor={this.props.editor}
+                      onSceneMount={scene => this.onSceneMount(asset.id, scene)}
+                    />
+                  </WrapItem>
+                ))}
               </Wrap>
             </Box>
           </Panel>
