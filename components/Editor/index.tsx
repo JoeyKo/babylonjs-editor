@@ -61,7 +61,13 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
     const scene = new Scene(engine);
     const light = new HemisphericLight("Asset Scene Light", new Vector3(0, 1, 0), scene);
     light.intensity = 0.7;
-   
+
+    engine.runRenderLoop(() => {
+      if (scene.activeCamera) {
+        scene.render()
+      }
+    })
+
     return scene;
   }
 

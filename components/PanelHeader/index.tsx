@@ -13,14 +13,14 @@ function PanelHeader({
   }
   return (
     <Flex
-      py={2}
+      h={"32px"}
       px={2}
       bg={"gray.800"}
       cursor="pointer"
       onClick={() => handleCollapse()}>
-      <HStack>
+      <HStack spacing={1}>
         <Icon fontSize={"md"} as={collapsed ? IoMdArrowDroprightCircle : IoMdArrowDropdownCircle} />
-        <Heading as="h4" fontSize="sm">{title}</Heading>
+        <Heading as="h4" fontSize="xs">{title}</Heading>
       </HStack>
     </Flex>
   )

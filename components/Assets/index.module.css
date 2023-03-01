@@ -9,13 +9,13 @@
 
 .ResizeHandle,
 .ResizeHandleCollapsed {
-  width: 0.2rem;
-  background-color: var(--chakra-colors-gray-800);
+  width: 0.15rem;
+  background-color: var(--chakra-colors-gray-0);
 }
 
 .VerticalResizeHandle,
 .VerticalResizeHandleCollapsed {
-  height: 0.2rem;
+  height: 0.15rem;
   background-color: var(--chakra-colors-gray-800);
 }
 

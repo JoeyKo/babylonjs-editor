@@ -22,10 +22,6 @@ function RenderCanvas({
         const view = scene.getEngine().registerView(renderCanvas.current, camera);
         console.log(view)
       }
-
-      setTimeout(() => {
-        scene.render();
-      }, 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

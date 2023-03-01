@@ -58,15 +58,16 @@ export class InspectorSection extends React.Component<IInspectorSectionProps, II
       <Box>
         <HStack
           cursor="pointer"
-          py={1.5}
+          h={8}
           px={2}
           bg="gray.800"
           color="gray.100"
+          spacing={1}
           onClick={() => this._handleCollapse()}>
           <Icon fontSize={"sm"} as={this.state.collapsed ? IoIosArrowForward : IoIosArrowDown} />
           <Heading
             as="h4"
-            fontSize="sm"
+            fontSize="xs"
           >
             {this.props.title}
           </Heading>

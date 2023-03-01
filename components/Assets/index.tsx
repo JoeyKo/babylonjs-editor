@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, SimpleGrid } from "@chakra-ui/react";
+import { Box, SimpleGrid, Wrap, WrapItem } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import {
   Tree,
@@ -59,36 +59,40 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
             maxSize={30}
             minSize={12}
           >
-            <ControlledTreeEnvironment
-              items={shortTree.items}
-              getItemTitle={item => item.data}
-              viewState={{
-                ['tree-assets']: {
-                  focusedItem,
-                  expandedItems,
-                  selectedItems,
-                },
-              }}
-              onFocusItem={item => this.setFocusedItem(item.index)}
-              onExpandItem={item => this.setExpandedItems([...expandedItems, item.index])}
-              onCollapseItem={item =>
-                this.setExpandedItems(expandedItems.filter(expandedItemIndex => expandedItemIndex !== item.index))
-              }
-              onSelectItems={items => this.setSelectedItems(items)}
-            >
-              <Tree treeId="tree-assets" rootItem="root" treeLabel="Assets" />
-            </ControlledTreeEnvironment>
+            <Box h="100%" bg="gray.800">
+              <ControlledTreeEnvironment
+                items={shortTree.items}
+                getItemTitle={item => item.data}
+                viewState={{
+                  ['tree-assets']: {
+                    focusedItem,
+                    expandedItems,
+                    selectedItems,
+                  },
+                }}
+                onFocusItem={item => this.setFocusedItem(item.index)}
+                onExpandItem={item => this.setExpandedItems([...expandedItems, item.index])}
+                onCollapseItem={item =>
+                  this.setExpandedItems(expandedItems.filter(expandedItemIndex => expandedItemIndex !== item.index))
+                }
+                onSelectItems={items => this.setSelectedItems(items)}
+              >
+                <Tree treeId="tree-assets" rootItem="root" treeLabel="Assets" />
+              </ControlledTreeEnvironment>
+            </Box>
           </Panel>
           <PanelResizeHandle className={styles.ResizeHandle} />
           <Panel>
-            <Box height="100%" overflow={"auto"}>
-              <SimpleGrid m={2} columns={6} spacing={2}>
+            <Box height="calc(100% - 32px)" overflow={"auto"}>
+              <Wrap p={2} spacing={2}>
                 {
-                  [1, 2, 3, 4, 5, 6].map((id: number) => (
-                    <Box key={id} height="120px"><RenderCanvas scene={this.props.editor.assetScene} /></Box>
+                  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((id: number) => (
+                    <WrapItem key={id} alignItems="center" justifyContent="center" w="100px" height="100px">
+                      <RenderCanvas scene={this.props.editor.assetScene} />
+                    </WrapItem>
                   ))
                 }
-              </SimpleGrid>
+              </Wrap>
             </Box>
           </Panel>
         </PanelGroup>
