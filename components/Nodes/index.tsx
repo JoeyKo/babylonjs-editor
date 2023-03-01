@@ -7,12 +7,12 @@ import {
   ControlledTreeEnvironment,
   TreeItemIndex
 } from "react-complex-tree";
-import { IEditor } from "../Editor";
+import Editor from "../Editor";
 import PanelHeader from "../PanelHeader";
 import { longTree, shortTree } from "./data";
 
 type INodesProps = {
-  editor: IEditor;
+  editor: Editor;
 }
 
 type INodesState = {

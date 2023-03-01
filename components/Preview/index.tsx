@@ -2,10 +2,10 @@
 import { createRef, PureComponent, ReactNode } from "react"
 import { Engine, Scene, FreeCamera, HemisphericLight, Vector3, CreateSphere, ParticleSystem, Texture, Color4 } from '@babylonjs/core';
 import styles from './index.module.scss';
-import { IEditor } from "../Editor";
+import Editor from "../Editor";
 
 type IPreviewProps = {
-  editor: IEditor;
+  editor: Editor;
   onSceneMount: (scene: Scene) => void;
 }
 
