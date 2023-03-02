@@ -5,31 +5,3 @@ body {
   overflow: hidden;
   user-select: none;
 }
-
-@import "react-complex-tree/lib/style-modern.css";
-
-.rct-tree-root {
-  min-height: calc(100% - 30px);
-  max-height: calc(100% - 30px);
-  max-width: 100%;
-  overflow: auto;
-}
-
-.rct-tree-item-button {
-  color: var(--chakra-colors-gray-300);
-}
-
-.rct-tree-item-title-container-selected .rct-tree-item-button {
-  background-color: var(--chakra-colors-gray-800);
-  color: var(--chakra-colors-gray-300);
-}
-
-.rct-tree-item-button:hover,
-.rct-tree-item-arrow.rct-tree-item-arrow-isFolder:hover {
-  background-color: var(--chakra-colors-gray-800);
-  color: var(--chakra-colors-gray-300);
-}
-
-.rct-tree-item-arrow-path {
-  fill: var(--chakra-colors-gray-300);
-}

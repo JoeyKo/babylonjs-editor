@@ -2,14 +2,8 @@
 
 import { Box, Wrap, WrapItem } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
-import {
-  Tree,
-  ControlledTreeEnvironment,
-  TreeItemIndex
-} from "react-complex-tree";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import Editor from "../Editor";
-import { shortTree } from "../Nodes/data";
 import PanelHeader from "../PanelHeader";
 import RenderCanvas from "./RenderCanvas";
 import styles from './index.module.css'
@@ -20,9 +14,6 @@ type INodesProps = {
 }
 
 type INodesState = {
-  focusedItem: TreeItemIndex | undefined;
-  expandedItems: TreeItemIndex[];
-  selectedItems: TreeItemIndex[];
   assets: any[];
 }
 
@@ -32,23 +23,8 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
     super(props);
 
     this.state = {
-      focusedItem: undefined,
-      expandedItems: [],
-      selectedItems: [],
       assets: [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }, { id: "5" }, { id: "6" }]
     }
-  }
-
-  public setFocusedItem(item: TreeItemIndex) {
-    this.setState({ focusedItem: item });
-  }
-
-  public setExpandedItems(items: TreeItemIndex[]) {
-    this.setState({ expandedItems: items })
-  }
-
-  public setSelectedItems(items: TreeItemIndex[]) {
-    this.setState({ selectedItems: items })
   }
 
   // Store each asset scene with id.
@@ -65,7 +41,6 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
   }
 
   render(): ReactNode {
-    const { focusedItem, expandedItems, selectedItems } = this.state;
     return (
       <Box h="100%">
         <PanelHeader title="资源" />
@@ -77,25 +52,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
             minSize={12}
           >
             <Box h="100%" bg="gray.800">
-              <ControlledTreeEnvironment
-                items={shortTree.items}
-                getItemTitle={item => item.data}
-                viewState={{
-                  ['tree-assets']: {
-                    focusedItem,
-                    expandedItems,
-                    selectedItems,
-                  },
-                }}
-                onFocusItem={item => this.setFocusedItem(item.index)}
-                onExpandItem={item => this.setExpandedItems([...expandedItems, item.index])}
-                onCollapseItem={item =>
-                  this.setExpandedItems(expandedItems.filter(expandedItemIndex => expandedItemIndex !== item.index))
-                }
-                onSelectItems={items => this.setSelectedItems(items)}
-              >
-                <Tree treeId="tree-assets" rootItem="root" treeLabel="Assets" />
-              </ControlledTreeEnvironment>
+              
             </Box>
           </Panel>
           <PanelResizeHandle className={styles.ResizeHandle} />
