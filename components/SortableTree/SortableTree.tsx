@@ -38,6 +38,7 @@ import type { FlattenedItem, SensorContext, TreeItems } from './types';
 import { sortableTreeKeyboardCoordinates } from './keyboardCoordinates';
 import { SortableTreeItem } from './components';
 import { CSS } from '@dnd-kit/utilities';
+import { ClickEvent } from '@szhsin/react-menu';
 
 const initialItems: TreeItems = [
   {
@@ -107,8 +108,7 @@ export function SortableTree({
   collapsible,
   defaultItems = initialItems,
   indicator = false,
-  indentationWidth = 20,
-  removable,
+  indentationWidth = 40,
 }: Props) {
   const [items, setItems] = useState(() => defaultItems);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
@@ -215,7 +215,7 @@ export function SortableTree({
                 ? () => handleCollapse(id, Boolean(collapsed && children.length))
                 : undefined
             }
-            onRemove={removable ? () => handleRemove(id) : undefined}
+            onMenuItemClick={e => handleMenuItemClick(e, id)}
           />
         ))}
         {createPortal(
@@ -300,6 +300,17 @@ export function SortableTree({
 
   function handleRemove(id: UniqueIdentifier) {
     setItems((items) => removeItem(items, id));
+  }
+
+  function handleMenuItemClick(e: ClickEvent, id: UniqueIdentifier) {
+    switch (e.value) {
+      case "remove":
+        handleRemove(id);
+        break;
+
+      default:
+        break;
+    }
   }
 
   function handleCollapse(id: UniqueIdentifier, collapsed: boolean) {

@@ -3,6 +3,20 @@
   box-sizing: border-box;
   padding-left: var(--spacing);
   margin-bottom: -1px;
+  cursor: pointer;
+
+  button[data-cypress="draggable-handle"] {
+    opacity: 0.2;
+    transition: opacity 0.3s;
+  }
+
+  &:hover {
+    button[data-cypress="draggable-handle"] {
+      opacity: 1;
+    }
+
+    background-color: var(--chakra-colors-gray-800);
+  }
 
   &.clone {
     display: inline-block;
@@ -122,4 +136,19 @@
   &.collapsed svg {
     transform: rotate(-90deg);
   }
+}
+
+.menu {
+  background-color: var(--chakra-colors-gray-800);
+  color: var(--chakra-colors-gray-100);
+  padding: 6px;
+}
+
+.menuItem {
+  padding: 6px 8px;
+}
+
+.menuItemHover {
+  padding: 6px 8px;
+  background-color: var(--chakra-colors-blue-500);
 }
