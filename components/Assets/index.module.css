@@ -3,20 +3,20 @@
 .VerticalResizeHandle,
 .ResizeHandleCollapsed .VerticalResizeHandleCollapsed {
   transition: 250ms linear background-color;
-  background-color: var(--chakra-colors-gray-800);
+  background-color: transparent;
   outline: none;
 }
 
 .ResizeHandle,
 .ResizeHandleCollapsed {
-  width: 0.15rem;
-  background-color: var(--chakra-colors-gray-0);
+  width: 0.25rem;
+  background-color: transparent;
 }
 
 .VerticalResizeHandle,
 .VerticalResizeHandleCollapsed {
-  height: 0.15rem;
-  background-color: var(--chakra-colors-gray-800);
+  height: 0.25rem;
+  background-color: transparent;
 }
 
 .ResizeHandle:hover,
@@ -32,5 +32,5 @@
 
 .ResizeHandleCollapsed,
 .VerticalResizeHandleCollapsed {
-  background-color: var(--chakra-colors-gray-800);
+  background-color: transparent;
 }
