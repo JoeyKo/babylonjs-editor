@@ -4,18 +4,18 @@ import { Box } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import Editor from "../Editor";
 import PanelHeader from "../PanelHeader";
-import { SortableTree } from "../SortableTree/SortableTree";
+import DraggableTree from "../DraggableTree";
 
-type INodesProps = {
+type IEntitiesProps = {
   editor: Editor;
 }
 
-type INodesState = {
+type IEntitiesState = {
 
 }
 
-export default class Nodes extends PureComponent<INodesProps, INodesState> {
-  constructor(props: INodesProps) {
+export default class Entities extends PureComponent<IEntitiesProps, IEntitiesState> {
+  constructor(props: IEntitiesProps) {
     super(props);
 
     this.state = {
@@ -26,7 +26,7 @@ export default class Nodes extends PureComponent<INodesProps, INodesState> {
     return (
       <Box>
         <PanelHeader title="层级" />
-        <SortableTree collapsible indicator />
+        <DraggableTree />
       </Box >
     )
   }

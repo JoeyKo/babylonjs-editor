@@ -2,7 +2,7 @@
 
 import { Flex, Heading, HStack, Spinner } from '@chakra-ui/react';
 import { Inspector } from '@/components/Inspectors/Inspector';
-import Nodes from '@/components/Nodes';
+import Entities from '@/components/Entities';
 import Preview from '@/components/Preview';
 import { Engine, HemisphericLight, MeshBuilder, Nullable, Observable, Scene, Vector3 } from '@babylonjs/core';
 import React, { PureComponent } from 'react';
@@ -104,7 +104,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
               maxSize={30}
               minSize={15}
             >
-              {engineLoaded ? <Nodes editor={this} /> : null}
+              {engineLoaded ? <Entities editor={this} /> : null}
             </Panel>
             <PanelResizeHandle className={
               nodesCollapsed
