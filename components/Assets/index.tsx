@@ -8,6 +8,7 @@ import PanelHeader from "../PanelHeader";
 import RenderCanvas from "./RenderCanvas";
 import styles from './index.module.css'
 import { Color4, Scene } from "@babylonjs/core";
+import DraggableTree from "../DraggableTree";
 
 type INodesProps = {
   editor: Editor;
@@ -52,7 +53,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
             minSize={12}
           >
             <Box h="100%" bg="gray.800">
-              
+              <DraggableTree />
             </Box>
           </Panel>
           <PanelResizeHandle className={styles.ResizeHandle} />

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Heading, HStack, Icon, Stack } from '@chakra-ui/react';
 import { BsBox } from 'react-icons/bs'
 import { BiDuplicate, BiTargetLock, BiTrash } from 'react-icons/bi'
@@ -8,6 +8,7 @@ import type { DataNode, TreeProps } from 'antd/es/tree';
 
 export const StyledTree = styled(Tree)`
   &.ant-tree {
+    border-radius: 0;
     color: var(--chakra-colors-gray-100);
     background-color: var(--chakra-colors-gray-700);
     .ant-tree-treenode {
@@ -71,6 +72,7 @@ const menuItems: any[] = [
 ];
 const DraggableTree: React.FC = () => {
   const [gData, setGData] = useState(defaultData);
+  const [dragImg, setDragImage] = useState<any>()
   const [expandedKeys] = useState(['0-0', '0-0-0', '0-0-0-0']);
 
   const onDragEnter: TreeProps['onDragEnter'] = (info) => {
@@ -146,7 +148,7 @@ const DraggableTree: React.FC = () => {
 
   return (
     <ConfigProvider theme={{
-      token: { colorPrimary: `var(--chakra-colors-blue-500)` }
+      // token: { colorPrimary: `var(--chakra-colors-blue-500)` }
     }}>
       <StyledTree
         defaultExpandedKeys={expandedKeys}
@@ -160,8 +162,6 @@ const DraggableTree: React.FC = () => {
     </ConfigProvider>
   );
 };
-
-
 
 function TreeEntity({
   entity
@@ -199,7 +199,7 @@ function TreeEntity({
     >
       <HStack h="24px" align="center">
         <Icon fontSize="xs" as={BsBox}></Icon>
-        <Heading fontSize="xs" as="span">{entity.title}</Heading>
+        <Heading fontSize="xs" noOfLines={1} as="span">{entity.title}</Heading>
       </HStack>
     </Dropdown>
   )

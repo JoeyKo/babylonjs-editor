@@ -1,6 +1,6 @@
 "use client";
 import { createRef, PureComponent, ReactNode } from "react"
-import { Engine, Scene, FreeCamera, HemisphericLight, Vector3, CreateSphere, ParticleSystem, Texture, Color4 } from '@babylonjs/core';
+import { Engine, Scene, FreeCamera, HemisphericLight, Vector3, CreateSphere, ParticleSystem, Texture, Color4, ArcRotateCamera, CreateBox } from '@babylonjs/core';
 import styles from './index.module.scss';
 import Editor from "../Editor";
 
@@ -36,30 +36,13 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
       engine?.resize()
     });
 
-    // Create our first scene.
     const scene = new Scene(engine);
-
-    // This creates and positions a free camera (non-mesh)
-    const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
-
-    // This targets the camera to scene origin
-    camera.setTarget(Vector3.Zero());
-
-    // This attaches the camera to the canvas
+    const camera = new ArcRotateCamera("Editor Camera", 0, 0, 5, Vector3.Zero(), scene);
     camera.attachControl(this.renderCanvas.current, true);
-
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
+    const light = new HemisphericLight("Editor Light", new Vector3(0, 1, 0), scene);
     light.intensity = 0.7;
-
-    // Our built-in 'sphere' shape.
-    const sphere = CreateSphere("sphere1", { segments: 16, diameter: 2 }, scene);
-
-    // Move the sphere upward 1/2 its height
-    sphere.position.y = 2;
- 
+    const sphere = CreateBox("Box", { size: 1 }, scene);
+    sphere.position = Vector3.Zero();
     this.props.onSceneMount(scene);
 
     // Render every frame
@@ -69,7 +52,6 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
   }
 
   render(): ReactNode {
-
     return (
       <canvas ref={this.renderCanvas} className={styles.renderCanvas}></canvas>
     )
