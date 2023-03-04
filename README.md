@@ -11,4 +11,4 @@ babylon.js v5
 
 ### 截图
 
-![截屏2023-02-25 20 34 01](https://user-images.githubusercontent.com/16659637/221356986-5dac7b5a-3dc6-4053-9270-709a155e9ccd.png)
+![截屏2023-03-04 14 50 40](https://user-images.githubusercontent.com/16659637/222880746-90d0cd14-1c6d-4be5-ab34-63c4e6772075.png)
