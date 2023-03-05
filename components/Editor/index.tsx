@@ -4,7 +4,7 @@ import { Flex, Heading, HStack, Spinner } from '@chakra-ui/react';
 import { Inspector } from '@/components/Inspectors/Inspector';
 import Entities from '@/components/Entities';
 import Preview from '@/components/Preview';
-import { Engine, HemisphericLight, MeshBuilder, Nullable, Observable, Scene, Vector3 } from '@babylonjs/core';
+import { Engine, Nullable, Observable, Scene, Vector3 } from '@babylonjs/core';
 import React, { PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Assets from '@/components/Assets';

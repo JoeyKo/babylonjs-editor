@@ -1,4 +1,5 @@
-'use client'
+"use client";
+
 import './globals.scss'
 
 import { CacheProvider } from '@chakra-ui/next-js'
@@ -19,7 +20,9 @@ export default function RootLayout({
       <head />
       <body>
         <CacheProvider>
-          <ChakraProvider theme={theme}>{children}</ChakraProvider>
+          <ChakraProvider theme={theme}>
+            {children}
+          </ChakraProvider>
         </CacheProvider>
       </body>
     </html>
