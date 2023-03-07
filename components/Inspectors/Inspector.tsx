@@ -1,6 +1,6 @@
-import { Undefinable } from "@/lib/types";
-import Utils from "@/lib/utils";
-import { Scene, Tools } from "@babylonjs/core";
+import { Undefinable } from "@/utils/types";
+import { Scene } from "@babylonjs/core";
+import Tools from "@/components/Editor/tools/tools";
 import { Box, Heading } from "@chakra-ui/react";
 import React from "react";
 import Editor from "../Editor";
@@ -117,7 +117,7 @@ export class Inspector extends React.PureComponent<IInspectorProps, IInspectorSt
     }
 
     let objectInspector = null;
-    const ctor = Utils.GetConstructorName(this.state.selectedObject);
+    const ctor = Tools.GetConstructorName(this.state.selectedObject);
 
     Inspector._ObjectInspectorsConfigurations.forEach((i) => {
       if (i.isSupported) {

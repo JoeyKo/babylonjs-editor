@@ -1,10 +1,11 @@
 "use client";
+
 import { createRef, PureComponent, ReactNode } from "react"
-import { Engine, Scene, FreeCamera, HemisphericLight, Vector3, CreateSphere, ParticleSystem, Texture, Color4, ArcRotateCamera, CreateBox } from '@babylonjs/core';
-import styles from './index.module.scss';
+import { Engine, Scene, HemisphericLight, Vector3, ArcRotateCamera, CreateBox } from '@babylonjs/core';
 import Editor from "../Editor";
 import { Box } from "@chakra-ui/react";
 import Toolbar from "./components/Toolbar";
+import styles from './index.module.scss';
 
 type IPreviewProps = {
   editor: Editor;
@@ -56,7 +57,15 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
   render(): ReactNode {
     return (
       <Box h="100%" pos={'relative'}>
-        <Box bg="gray.800" p="2" pos={"absolute"} borderRadius={2} top={2} left="50%" transform={"translateX(-50%)"}>
+        <Box
+          bg="gray.800"
+          p="2"
+          pos={"absolute"}
+          borderRadius={2}
+          top={2}
+          left="50%"
+          transform={"translateX(-50%)"}
+        >
           <Toolbar />
         </Box>
         <canvas ref={this.renderCanvas} className={styles.renderCanvas}></canvas>

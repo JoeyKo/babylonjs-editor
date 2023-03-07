@@ -1,12 +1,12 @@
 import { Scene } from "@babylonjs/core";
 import { ReactNode } from "react";
-import InspectorNumber from "../../../gui/inspector/fields/InspectorNumber";
+import InspectorNumber from "../../Editor/inspector/fields/InspectorNumber";
 import { IScriptInspectorState, ScriptInspector } from "../Script/ScriptInspector";
 import { Inspector } from "../Inspector";
-import { InspectorSection } from "@/gui/inspector/fields/InspectorSection";
+import { InspectorSection } from "@/components/Editor/inspector/fields/InspectorSection";
 import { Box, Stack } from "@chakra-ui/react";
-import InspectorInput from "@/gui/inspector/fields/InspectorInput";
-import { InspectorColorPicker } from "@/gui/inspector/fields/InspectorColorPicker";
+import InspectorInput from "@/components/Editor/inspector/fields/InspectorInput";
+import { InspectorColorPicker } from "@/components/Editor/inspector/fields/InspectorColorPicker";
 
 export class SceneInspector extends ScriptInspector<Scene, IScriptInspectorState>  {
 

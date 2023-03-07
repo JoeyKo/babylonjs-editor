@@ -1,4 +1,4 @@
-import InspectorUtils from "@/gui/inspector/utils";
+import InspectorUtils from "@/components/Editor/inspector/utils";
 import { Nullable } from "@babylonjs/core";
 import React from "react";
 import Editor from "../Editor";

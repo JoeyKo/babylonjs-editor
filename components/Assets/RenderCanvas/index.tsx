@@ -1,5 +1,5 @@
 import Editor from "@/components/Editor";
-import { Nullable } from "@/lib/types";
+import { Nullable } from "@/utils/types";
 import { ArcRotateCamera, HemisphericLight, MeshBuilder, Scene, Tools, Vector3 } from "@babylonjs/core";
 import { createRef, PureComponent, ReactNode } from "react"
 import styles from './index.module.scss';

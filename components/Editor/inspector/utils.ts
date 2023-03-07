@@ -1,6 +1,6 @@
 import { AbstractInspector } from "@/components/Inspectors/AbstractInspector";
-import { IStringDictionary, Nullable } from "@/lib/types";
-import Utils from "@/lib/utils";
+import { IStringDictionary, Nullable } from "@/utils/types";
+import Tools from "@/components/Editor/tools/tools";
 export interface IInspectorSectionPreferences {
     /**
      * Defines the title of the section.
@@ -30,7 +30,7 @@ class InspectorUtils {
      */
     public static SetCurrentInspector(inspector: AbstractInspector<any, any>): string {
         this._CurrentInspector = inspector;
-        this._CurrentInspectorName = Utils.GetConstructorName(inspector);
+        this._CurrentInspectorName = Tools.GetConstructorName(inspector);
 
         return this._CurrentInspectorName;
     }

@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { Box, Collapse, Fade, Heading, HStack, Icon, Stack } from "@chakra-ui/react";
-import { Nullable } from "@/lib/types";
+import { Nullable } from "@/utils/types";
 import InspectorUtils from "../utils";
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 
