@@ -96,7 +96,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
           </HStack>
         </Flex>
         <main className={styles.main}>
-          <PanelGroup direction="horizontal">
+          <PanelGroup autoSaveId='editor-panel' direction="horizontal">
             <Panel
               collapsible={true}
               onResize={this.resize}

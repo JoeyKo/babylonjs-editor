@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Heading, HStack, Icon, Stack } from '@chakra-ui/react';
 import { BsBox } from 'react-icons/bs'
 import { BiDuplicate, BiTargetLock, BiTrash } from 'react-icons/bi'
@@ -8,9 +8,11 @@ import type { DataNode, TreeProps } from 'antd/es/tree';
 
 export const StyledTree = styled(Tree)`
   &.ant-tree {
-    border-radius: 0;
+    height: calc(100% - 32px);
     color: var(--chakra-colors-gray-100);
-    background-color: var(--chakra-colors-gray-700);
+    background-color: transparent;
+    border-radius: 0;
+    overflow: auto;
     .ant-tree-treenode {
       /* &.drop-target {
         position: relative;
@@ -20,7 +22,8 @@ export const StyledTree = styled(Tree)`
       } */
       .ant-tree-node-content-wrapper {
         &.ant-tree-node-selected {
-          background-color: var(--chakra-colors-gray-800);
+          border-radius: 0;
+          background-color: var(--chakra-colors-blue-500);
         }
       }
     }
@@ -70,6 +73,7 @@ const menuItems: any[] = [
     icon: BiTrash
   },
 ];
+
 const DraggableTree: React.FC = () => {
   const [gData, setGData] = useState(defaultData);
   const [dragImg, setDragImage] = useState<any>()
@@ -147,19 +151,15 @@ const DraggableTree: React.FC = () => {
   };
 
   return (
-    <ConfigProvider theme={{
-      // token: { colorPrimary: `var(--chakra-colors-blue-500)` }
-    }}>
-      <StyledTree
-        defaultExpandedKeys={expandedKeys}
-        draggable={{ icon: false }}
-        blockNode
-        onDragEnter={onDragEnter}
-        titleRender={entity => <TreeEntity entity={entity} />}
-        onDrop={onDrop}
-        treeData={gData}
-      />
-    </ConfigProvider>
+    <StyledTree
+      defaultExpandedKeys={expandedKeys}
+      draggable={{ icon: false }}
+      blockNode
+      onDragEnter={onDragEnter}
+      titleRender={(entity: any) => <TreeEntity entity={entity} />}
+      onDrop={onDrop}
+      treeData={gData}
+    />
   );
 };
 

@@ -24,7 +24,7 @@ export default class Entities extends PureComponent<IEntitiesProps, IEntitiesSta
 
   render(): ReactNode {
     return (
-      <Box>
+      <Box h="100%">
         <PanelHeader title="层级" />
         <DraggableTree />
       </Box >
