@@ -1,28 +1,33 @@
-import { Flex, Heading, HStack, Icon } from "@chakra-ui/react";
+import { Box, Flex, Heading, HStack, Icon } from "@chakra-ui/react";
 import { useState } from "react";
 import { IoMdArrowDropdownCircle, IoMdArrowDroprightCircle } from "react-icons/io";
 
 function PanelHeader({
   title,
+  content
 }: {
-  title: string
+  title: string;
+  content?: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState<boolean>(false)
   function handleCollapse() {
     setCollapsed(!collapsed)
   }
   return (
-    <Flex
+    <HStack
       h={"32px"}
       px={2}
-      bg={"gray.800"}
-      cursor="pointer"
+      bg="gray.900"
+      boxShadow='base'
       onClick={() => handleCollapse()}>
-      <HStack spacing={1}>
+      <HStack spacing={1} cursor="pointer">
         <Icon fontSize={"md"} as={collapsed ? IoMdArrowDroprightCircle : IoMdArrowDropdownCircle} />
-        <Heading as="h4" fontSize="xs">{title}</Heading>
+        <Heading noOfLines={1} as="h4" fontSize="xs">{title}</Heading>
       </HStack>
-    </Flex>
+      <Box flex={1}>
+        {content}
+      </Box>
+    </HStack>
   )
 }
 

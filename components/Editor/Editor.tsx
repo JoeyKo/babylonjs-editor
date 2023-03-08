@@ -1,6 +1,6 @@
 "use client"
 
-import { Flex, Heading, HStack, Spinner } from '@chakra-ui/react';
+import { Box, Flex, Heading, HStack, Spinner } from '@chakra-ui/react';
 import { Inspector } from '@/components/Inspectors/Inspector';
 import Entities from '@/components/Entities';
 import Preview from '@/components/Preview';
@@ -85,18 +85,18 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
           top={0}
           w="100vw"
           h="200vh"
+          bg="gray.800"
           color="gray.100"
-          bg="gray.700"
           zIndex={999}
           overflow="hide"
           hidden={engineLoaded}
         >
-          <HStack spacing={2} w="100vw" h="100vh" justify="center">
+          <HStack spacing={2} minW="100vw" h="100vh" justify="center">
             <Spinner size="sm" />
             <Heading as="p" fontSize="md">编辑器初始化中...</Heading>
           </HStack>
         </Flex>
-        <main className={styles.main}>
+        <Box as="main" w="100vw" h="100vh" overflow="hidden">
           <PanelGroup autoSaveId='editor-panel' direction="horizontal">
             <Panel
               collapsible={true}
@@ -148,7 +148,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
               <Inspector editor={this} />
             </Panel>
           </PanelGroup>
-        </main>
+        </Box>
       </>
     )
   }

@@ -60,8 +60,8 @@ export class InspectorSection extends React.Component<IInspectorSectionProps, II
           cursor="pointer"
           h={8}
           px={2}
-          bg="gray.800"
-          color="gray.100"
+          bg="gray.900"
+          boxShadow='base'
           spacing={1}
           onClick={() => this._handleCollapse()}>
           <Icon fontSize={"sm"} as={this.state.collapsed ? IoIosArrowForward : IoIosArrowDown} />

@@ -1,9 +1,9 @@
-import { Divider, HStack, Icon } from "@chakra-ui/react";
+import { Divider, HStack, Icon, TypographyProps } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import { IconType } from "react-icons";
-import { FiHome, FiMove, FiRotateCw, FiSettings, FiPlay } from 'react-icons/fi';
+import { FiHome, FiMove, FiRotateCw, FiSettings } from 'react-icons/fi';
 import { MdOpenInFull } from 'react-icons/md';
-import { TfiFullscreen } from 'react-icons/tfi';
+import { BsArrowsFullscreen, BsFillPlayFill } from 'react-icons/bs';
 
 interface IToolbarProps {
 
@@ -14,11 +14,13 @@ interface IToolbarStates {
 }
 
 function IconButton({
-  as
+  as,
+  fontSize
 }: {
-  as: IconType | undefined
+  as: IconType | undefined,
+  fontSize?: TypographyProps["fontSize"];
 }) {
-  return <Icon cursor={"pointer"} as={as} />
+  return <Icon fontSize={fontSize} cursor={"pointer"} as={as} />
 }
 
 export default class Toolbar extends PureComponent<IToolbarProps, IToolbarStates> {
@@ -34,8 +36,8 @@ export default class Toolbar extends PureComponent<IToolbarProps, IToolbarStates
         <IconButton as={MdOpenInFull} />
         <IconButton as={FiSettings} />
         <Divider orientation='vertical' />
-        <IconButton as={TfiFullscreen} />
-        <IconButton as={FiPlay} />
+        <IconButton fontSize="sm" as={BsArrowsFullscreen} />
+        <IconButton fontSize="lg" as={BsFillPlayFill} />
       </HStack>
     )
   }

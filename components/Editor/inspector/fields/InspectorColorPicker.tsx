@@ -100,7 +100,7 @@ export class InspectorColorPicker extends React.Component<IInspectorColorPickerP
       <HStack spacing={2}>
         <Text w="25%" noOfLines={1} as="p" fontSize="xs">{this.props.label}</Text>
         <Box flex={1}>
-          <Popover isLazy>
+          <Popover isLazy placement='top-start'>
             <PopoverTrigger>
               <Box
                 w="100%"
@@ -122,8 +122,10 @@ export class InspectorColorPicker extends React.Component<IInspectorColorPickerP
             <PopoverContent w="auto">
               <PopoverBody p={0} borderRadius={"8px"}>
                 {this.state.isColor4 ?
-                  <HexAlphaColorPicker color={this.state.hex} onChange={color => this._handleColorChange(color)} />
-                  : <HexColorPicker color={this.state.hex} onChange={color => this._handleColorChange(color)} />}
+                  <HexAlphaColorPicker color={this.state.hex}
+                    onChange={color => this._handleColorChange(color)} />
+                  : <HexColorPicker color={this.state.hex}
+                    onChange={color => this._handleColorChange(color)} />}
               </PopoverBody>
             </PopoverContent>
           </Popover>

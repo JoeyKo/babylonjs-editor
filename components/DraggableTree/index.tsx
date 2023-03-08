@@ -3,7 +3,7 @@ import { Heading, HStack, Icon, Stack } from '@chakra-ui/react';
 import { BsBox } from 'react-icons/bs'
 import { BiDuplicate, BiTargetLock, BiTrash } from 'react-icons/bi'
 import styled from '@emotion/styled';
-import { ConfigProvider, Dropdown, Tree } from 'antd';
+import { Dropdown, Tree } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 
 export const StyledTree = styled(Tree)`
@@ -178,7 +178,7 @@ function TreeEntity({
       open={open}
       onOpenChange={handleOpenChange}
       dropdownRender={() => (
-        <Stack bg="gray.800" w="28" borderRadius={4} p={1.5} spacing={0} color="gray.100">
+        <Stack w="28" borderRadius={4} p={1.5} spacing={0}>
           {menuItems.map(item =>
             <HStack
               p={1.5}

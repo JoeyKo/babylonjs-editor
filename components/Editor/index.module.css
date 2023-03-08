@@ -1,10 +1,3 @@
-.main {
-  width: 100vw;
-  height: 100vh;
-  color: var(--chakra-colors-gray-100);
-  background-color: var(--chakra-colors-gray-700);
-}
-
 .ResizeHandle,
 .VerticalResizeHandle,
 .ResizeHandleCollapsed .VerticalResizeHandleCollapsed {

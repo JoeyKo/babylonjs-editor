@@ -58,8 +58,8 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
     return (
       <Box h="100%" pos={'relative'}>
         <Box
-          bg="gray.800"
           p="2"
+          bg="gray.800"
           pos={"absolute"}
           borderRadius={2}
           top={2}

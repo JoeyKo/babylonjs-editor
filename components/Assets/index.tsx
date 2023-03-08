@@ -1,14 +1,15 @@
 "use client"
 
+import { Color4, Scene } from "@babylonjs/core";
 import { Box, Wrap, WrapItem } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import Editor from "../Editor";
 import PanelHeader from "../PanelHeader";
 import RenderCanvas from "./RenderCanvas";
-import styles from './index.module.css'
-import { Color4, Scene } from "@babylonjs/core";
 import DraggableTree from "../DraggableTree";
+import AssetsToolbar from "./components/Toolbar";
+import styles from './index.module.css';
 
 type INodesProps = {
   editor: Editor;
@@ -44,7 +45,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
   render(): ReactNode {
     return (
       <Box h="100%">
-        <PanelHeader title="资源" />
+        <PanelHeader title="资源" content={<AssetsToolbar />} />
         <PanelGroup direction="horizontal">
           <Panel
             collapsible={false}
@@ -52,7 +53,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
             maxSize={30}
             minSize={12}
           >
-            <Box h="100%" bg="gray.800">
+            <Box h="100%">
               <DraggableTree />
             </Box>
           </Panel>
@@ -72,7 +73,6 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
             </Box>
           </Panel>
         </PanelGroup>
-
       </Box >
     )
   }
