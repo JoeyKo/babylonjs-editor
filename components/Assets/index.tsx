@@ -6,26 +6,36 @@ import { PureComponent, ReactNode } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import Editor from "../Editor";
 import PanelHeader from "../PanelHeader";
-import RenderCanvas from "./RenderCanvas";
 import DraggableTree from "../DraggableTree";
 import AssetsToolbar from "./components/Toolbar";
 import styles from './index.module.css';
+import Tools from "../Editor/tools/tools";
+import AssetMesh from "./components/Asset/Mesh";
+import AssetTexture from "./components/Asset/Texture";
 
-type INodesProps = {
+export interface IAsset {
+  id: string;
+  name: string;
+  filename: File;
+  extension: string;
+}
+
+interface INodesProps {
   editor: Editor;
 }
 
-type INodesState = {
-  assets: any[];
+interface INodesState {
+  assets: IAsset[];
 }
 
 export default class Assets extends PureComponent<INodesProps, INodesState> {
   public sceneInstances: { [key: string]: Scene } = {};
+
   constructor(props: INodesProps) {
     super(props);
 
     this.state = {
-      assets: [{ id: "1" }, { id: "2" }, { id: "3" }, { id: "4" }, { id: "5" }, { id: "6" }]
+      assets: []
     }
   }
 
@@ -42,10 +52,24 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
     }
   }
 
+  public onFilesUpload = (files: File[]) => {
+    const assets = this.state.assets;
+    this.setState({
+      assets: [...assets, ...files.map(file => {
+        return {
+          id: Tools.RandomId(),
+          name: file.name,
+          filename: file,
+          extension: Tools.GetFileExtension(file.name).toLowerCase()
+        }
+      })]
+    })
+  }
+
   render(): ReactNode {
     return (
       <Box h="100%">
-        <PanelHeader title="资源" content={<AssetsToolbar />} />
+        <PanelHeader title="资源" content={<AssetsToolbar onUpload={this.onFilesUpload} />} />
         <PanelGroup direction="horizontal">
           <Panel
             collapsible={false}
@@ -63,10 +87,11 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
               <Wrap p={2} spacing={2}>
                 {this.state.assets.map(asset => (
                   <WrapItem onClick={() => this.onAssetClick(asset.id)} key={asset.id} alignItems="center" justifyContent="center" w="100px" height="100px">
-                    <RenderCanvas
+                    {AssetMesh.MESH_EXTENSIONS.includes(asset.extension) ? <AssetMesh
+                      filename={asset.filename}
                       editor={this.props.editor}
                       onSceneMount={scene => this.onSceneMount(asset.id, scene)}
-                    />
+                    /> : <AssetTexture name={asset.name} url={""} />}
                   </WrapItem>
                 ))}
               </Wrap>

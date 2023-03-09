@@ -103,6 +103,11 @@
   resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-5.49.0.tgz#57cd6999ae1a1102799d490d8586ab8800d81f9b"
   integrity sha512-7DImzPWYqx8ZUIiBQbPMZWZOjCsNU1W50rGCEMg79vB1GJWicwoXG9fNCsnoK0P7vN6GhqpqwpKADYKQT/ngkg==
 
+"@babylonjs/loaders@^5.50.0":
+  version "5.50.0"
+  resolved "https://registry.npmjs.org/@babylonjs/loaders/-/loaders-5.50.0.tgz#d0834111dc72540fc3e93c42336d16ece8eaa114"
+  integrity sha512-fX/0J5FplIcutWxqqewO1B7zvR72v8hbrzg5UGW/ZFz34izMHCB3Q4q484nzvPIUyXsmW+Vg8zpIuvs3RINzjA==
+
 "@chakra-ui/accordion@2.1.9":
   version "2.1.9"
   resolved "https://registry.yarnpkg.com/@chakra-ui/accordion/-/accordion-2.1.9.tgz#20fa86d94dc034251df2f7c8595ae4dd541a29d9"

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@babylonjs/core": "^5.47.0",
+    "@babylonjs/loaders": "^5.50.0",
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/next-js": "^2.0.1",
     "@chakra-ui/react": "^2.5.1",

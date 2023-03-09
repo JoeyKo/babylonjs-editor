@@ -9,9 +9,11 @@ import React, { PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Assets from '@/components/Assets';
 import styles from './index.module.css';
+import { createStandaloneToast } from '@chakra-ui/toast'
 
 // Inspector
 import '@/components/Inspectors/Scene/SceneInspector';
+const { ToastContainer, toast } = createStandaloneToast()
 
 type IEditorStates = {
   nodesCollapsed: boolean;
@@ -149,6 +151,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
             </Panel>
           </PanelGroup>
         </Box>
+        <ToastContainer />
       </>
     )
   }

@@ -23,6 +23,10 @@ class Tools {
   public static RandomId(): string {
     return BabylonTools.RandomId();
   }
+
+  public static GetFileExtension(filename: string): string {
+    return "." + (filename.split('.').pop() ?? "");
+  }
 }
 
 export default Tools;

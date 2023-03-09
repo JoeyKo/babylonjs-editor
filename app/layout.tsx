@@ -5,6 +5,7 @@ import './globals.scss'
 import { CacheProvider } from '@chakra-ui/next-js'
 import { ChakraProvider } from '@chakra-ui/react'
 import theme from './theme'
+import { createStandaloneToast } from '@chakra-ui/toast'
 
 export default function RootLayout({
   children,

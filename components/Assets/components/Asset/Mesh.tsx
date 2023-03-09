@@ -1,30 +1,38 @@
 import Editor from "@/components/Editor";
+import { SceneTools } from "@/components/Editor/scene/tools";
 import { Nullable } from "@/utils/types";
-import { ArcRotateCamera, HemisphericLight, MeshBuilder, Scene, Tools, Vector3 } from "@babylonjs/core";
+import { ArcRotateCamera, HemisphericLight, Scene, Tools, Vector3 } from "@babylonjs/core";
 import { createRef, PureComponent, ReactNode } from "react"
 import styles from './index.module.scss';
-
-type IAssetRenderCanvasStates = {
+import "@babylonjs/loaders"
+type IAssetMeshStates = {
 
 }
 
-type IAssetRenderCanvasProps = {
+type IAssetMeshProps = {
   editor: Editor;
+  filename: File;
   onSceneMount: (scene: Scene) => void;
 }
 
 
-export default class AssetRenderCanvas extends PureComponent<IAssetRenderCanvasProps, IAssetRenderCanvasStates> {
+export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMeshStates> {
+  public static MESH_EXTENSIONS: string[] = [
+    ".fbx",
+    ".gltf", ".glb",
+    ".babylon",
+    ".obj", ".stl",
+  ];
   public editor: Editor;
-  public assetRenderCanvas = createRef<HTMLCanvasElement>();
+  public assetMeshCanvas = createRef<HTMLCanvasElement>();
   public scene: Nullable<Scene> = null;
 
-  constructor(props: IAssetRenderCanvasProps) {
+  constructor(props: IAssetMeshProps) {
     super(props);
     this.editor = props.editor;
   }
 
-  componentDidMount(): void {
+  async componentDidMount(): Promise<void> {
     if (this.scene) { return; }
 
     const engine = this.editor.assetRenderEngine;
@@ -38,11 +46,11 @@ export default class AssetRenderCanvas extends PureComponent<IAssetRenderCanvasP
       const camera = new ArcRotateCamera("Asset Render Camera" + Tools.RandomId(), 0, 0.8, 5, new Vector3(Math.random(), Math.random(), Math.random()), scene);
       camera.setTarget(new Vector3(Math.random(), Math.random(), Math.random()));
 
-      const box = MeshBuilder.CreateBox("Box", { size: Math.random() }, scene);
-      box.position.y = Math.random();
-
-      if (this.assetRenderCanvas.current) {
-        const view = engine.registerView(this.assetRenderCanvas.current, camera);
+      await SceneTools.ImportMeshAsync("", this.props.filename, scene);
+      scene.stopAllAnimations();
+      
+      if (this.assetMeshCanvas.current) {
+        const view = engine.registerView(this.assetMeshCanvas.current, camera);
         engine.runRenderLoop(() => {
           if (engine.activeView?.target === view?.target) {
             scene.render()
@@ -55,11 +63,11 @@ export default class AssetRenderCanvas extends PureComponent<IAssetRenderCanvasP
   }
 
   componentWillUnmount(): void {
-      this.scene?.dispose();
-      this.scene = null;
+    this.scene?.dispose();
+    this.scene = null;
   }
 
   render(): ReactNode {
-    return <canvas className={styles.renderCanvas} ref={this.assetRenderCanvas}></canvas>
+    return <canvas className={styles.renderCanvas} ref={this.assetMeshCanvas}></canvas>
   }
 }
