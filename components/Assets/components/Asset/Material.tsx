@@ -3,7 +3,7 @@ import { SceneTools } from "@/components/Editor/scene/tools";
 import { Nullable } from "@/utils/types";
 import {
   AbstractMesh, ArcRotateCamera, Camera, HemisphericLight,
-  Mesh, Scene, TargetCamera, Tools, Vector3, Animation, Color4, CubeTexture
+  Mesh, Scene, TargetCamera, Tools, Vector3, Animation, Color4, CubeTexture, MeshBuilder
 } from "@babylonjs/core";
 import { createRef, PureComponent, ReactNode } from "react"
 import styles from './index.module.scss';
@@ -22,12 +22,6 @@ type IAssetMeshProps = {
 
 
 export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMeshStates> {
-  public static MESH_EXTENSIONS: string[] = [
-    ".fbx",
-    ".gltf", ".glb",
-    ".babylon",
-    ".obj", ".stl",
-  ];
   public editor: Editor;
   public assetMeshCanvas = createRef<HTMLCanvasElement>();
   public scene: Nullable<Scene> = null;
@@ -53,7 +47,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       new HemisphericLight("AssetsHelperLight", new Vector3(0, 1, 0), this.scene);
       const texture = CubeTexture.CreateFromPrefilteredData("/textures/studio.env", this.scene);
       this.scene.environmentTexture = texture;
-
+      MeshBuilder.CreateSphere("MaterialsSphere", { segments: 32 }, this.scene);
       const { meshes } = await SceneTools.ImportMeshAsync("", this.props.filename, scene);
 
       if (this.assetMeshCanvas.current) {
@@ -100,7 +94,6 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       this.props.onSceneMount(scene);
     }
   }
-
 
   componentWillUnmount(): void {
     this.scene?.dispose();

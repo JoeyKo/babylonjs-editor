@@ -48,7 +48,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
   public onAssetClick(id: string) {
     const scene = this.sceneInstances[id];
     if (scene) {
-      scene.clearColor = Color4.FromHexString("#ddd333")
+      console.log("Selected scene: ", scene)
     }
   }
 
@@ -87,11 +87,13 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
               <Wrap p={2} spacing={2}>
                 {this.state.assets.map(asset => (
                   <WrapItem onClick={() => this.onAssetClick(asset.id)} key={asset.id} alignItems="center" justifyContent="center" w="100px" height="100px">
-                    {AssetMesh.MESH_EXTENSIONS.includes(asset.extension) ? <AssetMesh
-                      filename={asset.filename}
-                      editor={this.props.editor}
-                      onSceneMount={scene => this.onSceneMount(asset.id, scene)}
-                    /> : <AssetTexture name={asset.name} url={""} />}
+                    {AssetMesh.MESH_EXTENSIONS.includes(asset.extension) ?
+                      <AssetMesh
+                        name={asset.name}
+                        filename={asset.filename}
+                        editor={this.props.editor}
+                        onSceneMount={scene => this.onSceneMount(asset.id, scene)}
+                      /> : <AssetTexture name={asset.name} filename={asset.filename} />}
                   </WrapItem>
                 ))}
               </Wrap>

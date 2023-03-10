@@ -98,10 +98,10 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@babylonjs/core@^5.47.0":
-  version "5.49.0"
-  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-5.49.0.tgz#57cd6999ae1a1102799d490d8586ab8800d81f9b"
-  integrity sha512-7DImzPWYqx8ZUIiBQbPMZWZOjCsNU1W50rGCEMg79vB1GJWicwoXG9fNCsnoK0P7vN6GhqpqwpKADYKQT/ngkg==
+"@babylonjs/core@^5.50.0":
+  version "5.50.1"
+  resolved "https://registry.yarnpkg.com/@babylonjs/core/-/core-5.50.1.tgz#338c82810bb7fdf3b2848d784e33ce0fa35744c1"
+  integrity sha512-XlZVlDvsGZRKLqeld0nCa4rWUsiCAEGXr9CjPkkUWzZiO3k2jnLGZmAghbWMZCFS6jXdDoZMA9KiMyfvnO5D/Q==
 
 "@babylonjs/loaders@^5.50.0":
   version "5.50.0"
