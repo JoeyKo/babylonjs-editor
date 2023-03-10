@@ -1,16 +1,16 @@
 import Editor from "@/components/Editor";
-import { SceneTools } from "@/components/Editor/scene/tools";
 import { Nullable } from "@/utils/types";
 import {
-  AbstractMesh, ArcRotateCamera, Camera, HemisphericLight,
-  Mesh, Scene, TargetCamera, Tools, Vector3, Animation, Color4, CubeTexture
+  HemisphericLight,
+  Scene, TargetCamera, Vector3, Color4, CubeTexture, SceneLoader
 } from "@babylonjs/core";
+import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
-import styles from './index.module.scss';
-import "@babylonjs/loaders"
-import { Stack, Text } from "@chakra-ui/react";
-type IAssetMeshStates = {
+import { Box, Progress, Stack, Text } from "@chakra-ui/react";
 
+type IAssetMeshStates = {
+  loadedPercent: number;
+  loaded: boolean;
 }
 
 type IAssetMeshProps = {
@@ -35,9 +35,13 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
   constructor(props: IAssetMeshProps) {
     super(props);
     this.editor = props.editor;
+    this.state = {
+      loadedPercent: 0,
+      loaded: false,
+    }
   }
 
-  async componentDidMount(): Promise<void> {
+  componentDidMount(): void {
     if (this.scene) { return; }
 
     const engine = this.editor.assetRenderEngine;
@@ -54,52 +58,64 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       const texture = CubeTexture.CreateFromPrefilteredData("/textures/studio.env", this.scene);
       this.scene.environmentTexture = texture;
 
-      const { meshes } = await SceneTools.ImportMeshAsync("", this.props.filename, scene);
+      SceneLoader.ImportMesh("", "", this.props.filename, scene, () => {
+        scene.stopAllAnimations();
+        scene.executeWhenReady(async () => {
+          await new Promise<void>((resolve) => setTimeout(() => resolve(), 100));
 
-      scene.executeWhenReady(async () => {
-        await new Promise<void>((resolve) => setTimeout(() => resolve(), 100));
+          this.setState({ loaded: true });
 
-        const minimum = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-        const maximum = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+          const minimum = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+          const maximum = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
 
-        meshes.forEach((d) => {
-          const scaling = Vector3.Zero();
-          d.getWorldMatrix().decompose(scaling, undefined, undefined);
+          scene.meshes.forEach((d) => {
+            const scaling = Vector3.Zero();
+            d.getWorldMatrix().decompose(scaling, undefined, undefined);
 
-          const bMinimum = d.getBoundingInfo()?.minimum.multiply(scaling);
-          const bMaximum = d.getBoundingInfo()?.maximum.multiply(scaling);
+            const bMinimum = d.getBoundingInfo()?.minimum.multiply(scaling);
+            const bMaximum = d.getBoundingInfo()?.maximum.multiply(scaling);
 
-          if (!bMinimum || !bMaximum) { return; }
+            if (!bMinimum || !bMaximum) { return; }
 
-          maximum.x = Math.max(bMaximum.x, maximum.x);
-          maximum.y = Math.max(bMaximum.y, maximum.y);
-          maximum.z = Math.max(bMaximum.z, maximum.z);
+            maximum.x = Math.max(bMaximum.x, maximum.x);
+            maximum.y = Math.max(bMaximum.y, maximum.y);
+            maximum.z = Math.max(bMaximum.z, maximum.z);
 
-          minimum.x = Math.min(bMinimum.x, minimum.x);
-          minimum.y = Math.min(bMinimum.y, minimum.y);
-          minimum.z = Math.min(bMinimum.z, minimum.z);
+            minimum.x = Math.min(bMinimum.x, minimum.x);
+            minimum.y = Math.min(bMinimum.y, minimum.y);
+            minimum.z = Math.min(bMinimum.z, minimum.z);
+          });
+
+          const center = Vector3.Center(minimum, maximum);
+          const distance = Vector3.Distance(minimum, maximum) * 2;
+
+          camera.position = center.add(new Vector3(distance, distance, distance));
+          camera.setTarget(center);
+
+          if (this.assetMeshCanvas.current) {
+            const view = engine.registerView(this.assetMeshCanvas.current, camera);
+
+            engine.runRenderLoop(() => {
+              if (engine.activeView?.target === view?.target) {
+                scene.render()
+              }
+            });
+
+            this.props.onSceneMount(scene);
+          }
         });
 
-        const center = Vector3.Center(minimum, maximum);
-        const distance = Vector3.Distance(minimum, maximum) * 0.5;
-
-        camera.position = center.add(new Vector3(distance, distance, distance));
-        camera.setTarget(center);
-
-        if (this.assetMeshCanvas.current) {
-          const view = engine.registerView(this.assetMeshCanvas.current, camera);
-
-          engine.runRenderLoop(() => {
-            if (engine.activeView?.target === view?.target) {
-              scene.render()
-            }
-          });
-          
-          this.props.onSceneMount(scene);
+        scene._checkIsReady();
+      }, evt => {
+        let loadedPercent: number = 0;
+        if (evt.lengthComputable) {
+          loadedPercent = +(evt.loaded * 100 / evt.total).toFixed();
+        } else {
+          const dlCount = evt.loaded / (1024 * 1024);
+          loadedPercent = Math.floor(dlCount * 100.0) / 100.0;
         }
+        this.setState({ loadedPercent });
       });
-
-      scene._checkIsReady();
     }
   }
 
@@ -110,9 +126,14 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
 
   render(): ReactNode {
     return (
-      <Stack spacing={1} w="100px" align="center" overflow={"hidden"}>
-        <canvas className={styles.renderCanvas} ref={this.assetMeshCanvas}></canvas>
+      <Stack pos="relative" spacing={1} w="100px" align="center" overflow={"hidden"}>
+        <Box w="64px" h="64px" pos="relative">
+          <canvas style={{ width: "100%", height: "100%" }} ref={this.assetMeshCanvas} />
+          <Progress value={this.state.loadedPercent}
+            hidden={this.state.loaded} w="64px" size='xs' top="50%" transform={'translateY(-50%)'} pos={"absolute"} />
+        </Box>
         <Text maxW={"100px"} fontSize={"xs"} noOfLines={1} textAlign="center">{this.props.name}</Text>
-      </Stack>)
+      </Stack>
+    )
   }
 }

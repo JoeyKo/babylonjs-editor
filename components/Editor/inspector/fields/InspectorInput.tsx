@@ -15,7 +15,7 @@ function InspectorInput({
     <HStack spacing={2}>
       <Text w="25%" noOfLines={1} as="p" fontSize="xs">{label}</Text>
       <Box flex={1}>
-        <Input size="xs" variant="filled" />
+        <Input />
       </Box>
     </HStack>
   )

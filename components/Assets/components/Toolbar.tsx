@@ -27,9 +27,6 @@ export default function AssetsToolbar({
           <option value='model'>模型</option>
           <option value='material'>材质</option>
           <option value='texutre'>贴图</option>
-          <option value='particle-system'>粒子</option>
-          <option value='animation'>动画</option>
-          <option value='script'>脚本</option>
         </Select>
         <InputGroup size="xs">
           <InputLeftElement
@@ -37,7 +34,7 @@ export default function AssetsToolbar({
             // eslint-disable-next-line react/no-children-prop
             children={<SearchIcon />}
           />
-          <Input placeholder='搜索名称' variant="filled" />
+          <Input placeholder='搜索名称' />
         </InputGroup>
       </HStack>
       <Spacer />

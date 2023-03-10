@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, HStack, IconButton, Input, InputGroup, InputLeftElement, Stack } from "@chakra-ui/react";
+import { Box, HStack, IconButton, Input, InputGroup, InputLeftElement, Menu, MenuButton, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import Editor from "../Editor";
 import PanelHeader from "../PanelHeader";
@@ -36,9 +36,24 @@ export default class Entities extends PureComponent<IEntitiesProps, IEntitiesSta
                 // eslint-disable-next-line react/no-children-prop
                 children={<SearchIcon />}
               />
-              <Input placeholder='搜索名称' variant="filled" />
+              <Input placeholder="搜索名称" />
             </InputGroup>
-            <IconButton size="xs" fontSize={"md"} icon={<MdAdd />} aria-label={"创建"} />
+            <Menu size={"xs"}>
+              <MenuButton
+                as={IconButton}
+                size="xs"
+                fontSize={"md"}
+                aria-label='创建'
+                icon={<MdAdd />}
+              />
+              <MenuList>
+                <MenuItem>组</MenuItem>
+                <MenuItem>盒子</MenuItem>
+                <MenuItem>球体</MenuItem>
+                <MenuItem>面片</MenuItem>
+                <MenuItem>粒子</MenuItem>
+              </MenuList>
+            </Menu>
           </HStack>
           <DraggableTree />
         </Stack>

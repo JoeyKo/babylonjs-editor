@@ -23,7 +23,7 @@ export const StyledTree = styled(Tree)`
       .ant-tree-node-content-wrapper {
         &.ant-tree-node-selected {
           border-radius: 0;
-          background-color: var(--chakra-colors-blue-500);
+          background-color: var(--chakra-colors-blue-900);
         }
       }
     }
@@ -178,7 +178,7 @@ function TreeEntity({
       open={open}
       onOpenChange={handleOpenChange}
       dropdownRender={() => (
-        <Stack w="28" borderRadius={4} p={1.5} spacing={0}>
+        <Stack w="28" bg="gray.900" color="gray.100" borderRadius={4} p={1.5} spacing={0}>
           {menuItems.map(item =>
             <HStack
               p={1.5}

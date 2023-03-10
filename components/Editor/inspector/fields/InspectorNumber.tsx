@@ -16,11 +16,11 @@ function InspectorNumber({
     <HStack spacing={2}>
       <Text w="25%" noOfLines={1} as="p" fontSize="xs">{label}</Text>
       <Box flex={1}>
-        <NumberInput size="xs" variant="filled">
+        <NumberInput>
           <NumberInputField />
           <NumberInputStepper>
-            <NumberIncrementStepper fontSize={"3xs"} />
-            <NumberDecrementStepper  fontSize={"3xs"} />
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
           </NumberInputStepper>
         </NumberInput>
       </Box>
