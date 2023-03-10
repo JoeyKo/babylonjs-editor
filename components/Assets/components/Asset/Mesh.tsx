@@ -56,51 +56,52 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
 
       const { meshes } = await SceneTools.ImportMeshAsync("", this.props.filename, scene);
 
-      if (this.assetMeshCanvas.current) {
-        const view = engine.registerView(this.assetMeshCanvas.current, camera);
-        scene.executeWhenReady(async () => {
-          await new Promise<void>((resolve) => setTimeout(() => resolve(), 100));
+      scene.executeWhenReady(async () => {
+        await new Promise<void>((resolve) => setTimeout(() => resolve(), 100));
 
-          const minimum = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-          const maximum = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+        const minimum = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
+        const maximum = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
 
-          meshes.forEach((d) => {
-            const scaling = Vector3.Zero();
-            d.getWorldMatrix().decompose(scaling, undefined, undefined);
+        meshes.forEach((d) => {
+          const scaling = Vector3.Zero();
+          d.getWorldMatrix().decompose(scaling, undefined, undefined);
 
-            const bMinimum = d.getBoundingInfo()?.minimum.multiply(scaling);
-            const bMaximum = d.getBoundingInfo()?.maximum.multiply(scaling);
+          const bMinimum = d.getBoundingInfo()?.minimum.multiply(scaling);
+          const bMaximum = d.getBoundingInfo()?.maximum.multiply(scaling);
 
-            if (!bMinimum || !bMaximum) { return; }
+          if (!bMinimum || !bMaximum) { return; }
 
-            maximum.x = Math.max(bMaximum.x, maximum.x);
-            maximum.y = Math.max(bMaximum.y, maximum.y);
-            maximum.z = Math.max(bMaximum.z, maximum.z);
+          maximum.x = Math.max(bMaximum.x, maximum.x);
+          maximum.y = Math.max(bMaximum.y, maximum.y);
+          maximum.z = Math.max(bMaximum.z, maximum.z);
 
-            minimum.x = Math.min(bMinimum.x, minimum.x);
-            minimum.y = Math.min(bMinimum.y, minimum.y);
-            minimum.z = Math.min(bMinimum.z, minimum.z);
-          });
+          minimum.x = Math.min(bMinimum.x, minimum.x);
+          minimum.y = Math.min(bMinimum.y, minimum.y);
+          minimum.z = Math.min(bMinimum.z, minimum.z);
+        });
 
-          const center = Vector3.Center(minimum, maximum);
-          const distance = Vector3.Distance(minimum, maximum) * 0.5;
+        const center = Vector3.Center(minimum, maximum);
+        const distance = Vector3.Distance(minimum, maximum) * 0.5;
 
-          camera.position = center.add(new Vector3(distance, distance, distance));
-          camera.setTarget(center);
+        camera.position = center.add(new Vector3(distance, distance, distance));
+        camera.setTarget(center);
+
+        if (this.assetMeshCanvas.current) {
+          const view = engine.registerView(this.assetMeshCanvas.current, camera);
 
           engine.runRenderLoop(() => {
             if (engine.activeView?.target === view?.target) {
               scene.render()
             }
           });
-        });
-        scene._checkIsReady();
-      }
+          
+          this.props.onSceneMount(scene);
+        }
+      });
 
-      this.props.onSceneMount(scene);
+      scene._checkIsReady();
     }
   }
-
 
   componentWillUnmount(): void {
     this.scene?.dispose();
