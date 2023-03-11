@@ -14,6 +14,7 @@ import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
 import { Box, Progress, Stack, Text } from "@chakra-ui/react";
 import { SceneUtils } from "@/components/Editor/scene/utils";
+import { MdShapeLine } from "react-icons/md";
 
 type IAssetMeshStates = {
   loadedPercent: number;
@@ -100,8 +101,9 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
           this._pivotMesh.rotation.y += Math.PI;
 
           meshes.forEach((mesh) => {
-            Tags.AddTagsTo(mesh, "assetMesh");
-            mesh.parent = this._pivotMesh;
+            if (!mesh.parent) {
+              mesh.parent = this._pivotMesh;
+            }
           });
 
           const camera = this.initCamera(scene);
@@ -113,10 +115,16 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
 
           camera.setTarget(center);
 
+
           const sceneDiagonalLenght = sizeVec.length();
           if (isFinite(sceneDiagonalLenght)) {
             camera.upperRadiusLimit = sceneDiagonalLenght * 4;
           }
+
+          // setTimeout(() => {
+          //   this.rootMesh?.dispose(true)
+          //   this._pivotMesh?.dispose(true);
+          // }, 100);
 
           if (this.assetMeshCanvas.current) {
             const view = engine.registerView(this.assetMeshCanvas.current, camera);
@@ -152,7 +160,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
     const worldSize = worldExtends.max.subtract(worldExtends.min);
     const worldCenter = worldExtends.min.add(worldSize.scale(0.5));
 
-    let radius = worldSize.length();
+    let radius = worldSize.length() * 1.5;
     // empty scene scenario!
     if (!isFinite(radius)) {
       radius = 1;
