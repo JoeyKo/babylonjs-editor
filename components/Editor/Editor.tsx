@@ -8,12 +8,15 @@ import { Engine, Nullable, Observable, Scene } from '@babylonjs/core';
 import React, { PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Assets from '@/components/Assets';
-import styles from './index.module.css';
 import { createStandaloneToast } from '@chakra-ui/toast'
+import { SceneUtils } from './scene/utils';
 
 // Inspector
 import '@/components/Inspectors/Scene/SceneInspector';
-const { ToastContainer, toast } = createStandaloneToast()
+
+import styles from './index.module.css';
+
+const { ToastContainer } = createStandaloneToast()
 
 type IEditorStates = {
   nodesCollapsed: boolean;
@@ -28,6 +31,7 @@ type IEditorProps = {
 
 export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
   public scene: Nullable<Scene> = null;
+  public sceneUtils: Nullable<SceneUtils> = null;
   public inspector: Nullable<Inspector> = null;
   public selectedSceneObservable: Observable<Scene> = new Observable<Scene>();
   // Asset engine for multiple scenes
@@ -54,18 +58,22 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
   }
 
   public createAssetRenderEngine() {
-    return new Engine(document.createElement("canvas"), true);
+    return new Engine(document.createElement("canvas"), false, {}, false);
   }
 
   public onSceneMount = (scene: Scene) => {
     this.scene = scene;
     this.setState({ engineLoaded: true });
 
-    this.assetRenderEngine = this.createAssetRenderEngine();
+    // Utils
+    this.sceneUtils = new SceneUtils(this);
 
     this._bindEvents();
 
     this.selectedSceneObservable.notifyObservers(this.scene!);
+    
+    // Create asset babylonjs engine
+    this.assetRenderEngine = this.createAssetRenderEngine();
   }
 
   public resize = () => {

@@ -33,7 +33,7 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
     if (this.props.editor.scene) { return; }
 
     // Associate a Babylon Engine to it.
-    const engine = new Engine(this.renderCanvas.current);
+    const engine = new Engine(this.renderCanvas.current, false, {}, false);
 
     window.addEventListener("resize", () => {
       engine?.resize()

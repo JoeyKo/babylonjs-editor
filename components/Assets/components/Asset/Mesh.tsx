@@ -1,12 +1,19 @@
+"use client";
+
 import Editor from "@/components/Editor";
 import { Nullable } from "@/utils/types";
 import {
   HemisphericLight,
-  Scene, TargetCamera, Vector3, Color4, CubeTexture, SceneLoader
+  Scene, Vector3, Color4, CubeTexture, SceneLoader,
+  BRDFTextureTools,
+  ArcRotateCamera,
+  AbstractMesh,
+  Tags
 } from "@babylonjs/core";
 import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
 import { Box, Progress, Stack, Text } from "@chakra-ui/react";
+import { SceneUtils } from "@/components/Editor/scene/utils";
 
 type IAssetMeshStates = {
   loadedPercent: number;
@@ -31,6 +38,9 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
   public editor: Editor;
   public assetMeshCanvas = createRef<HTMLCanvasElement>();
   public scene: Nullable<Scene> = null;
+  public sceneUtils: Nullable<SceneUtils> = null;
+  public rootMesh: Nullable<AbstractMesh> = null;
+  private _pivotMesh: Nullable<AbstractMesh> = null;
 
   constructor(props: IAssetMeshProps) {
     super(props);
@@ -39,6 +49,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       loadedPercent: 0,
       loaded: false,
     }
+
   }
 
   componentDidMount(): void {
@@ -47,50 +58,65 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
     const engine = this.editor.assetRenderEngine;
     if (engine) {
       const scene = new Scene(engine);
+
       this.scene = scene;
       this.scene.clearColor = new Color4(0, 0, 0, 0);
       this.scene.defaultMaterial.backFaceCulling = false;
 
-      const camera = new TargetCamera("AssetsHelperCamera", new Vector3(0, 0, 0), this.scene, true);
-      camera.minZ = 0.1;
+      const light = new HemisphericLight("AssetsHelperLight", new Vector3(0, 1, 0), this.scene);
+      light.doNotSerialize = true;
 
-      new HemisphericLight("AssetsHelperLight", new Vector3(0, 1, 0), this.scene);
-      const texture = CubeTexture.CreateFromPrefilteredData("/textures/studio.env", this.scene);
-      this.scene.environmentTexture = texture;
+      const envTexture = CubeTexture.CreateFromPrefilteredData("/textures/studio.env", this.scene);
+      envTexture.name = "studio env"
+      this.scene.environmentTexture = envTexture;
 
-      SceneLoader.ImportMesh("", "", this.props.filename, scene, () => {
-        scene.stopAllAnimations();
+      SceneLoader.ImportMesh("", "", this.props.filename, scene, async (meshes, particleSystems, skeletons, animationGroups, transformNodes, geometries, lights) => {
+        animationGroups.forEach(animationGroup => animationGroup.stop())
+        // console.log(scene.meshes
+        //   .filter((m) => !m._masterMesh))
+        // const materials = scene.materials;
+        // const textures = scene.textures;
+        // console.log(transformNodes.map(transformNode => transformNode.serialize()))
+        // // console.log(geometries.map(geometry => geometry.serialize()))
+        // console.log(geometries.map(geometry => geometry.serializeVerticeData())) // extract geometreis files
+        // console.log(meshes.map(mesh => mesh.serialize()))
+        // console.log(materials.filter(material => material !== scene.defaultMaterial).map(material => material.serialize()))
+        // console.log(textures.filter(texture => texture !== envTexture && texture !== BRDFTextureTools.GetEnvironmentBRDFTexture(scene)).map(material => material.serialize()))
+
+        // meshes
+        // delete m.geometryUniqueId;
+        // delete m.materialUniqueId;
+
         scene.executeWhenReady(async () => {
           await new Promise<void>((resolve) => setTimeout(() => resolve(), 100));
 
           this.setState({ loaded: true });
 
-          const minimum = new Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-          const maximum = new Vector3(Number.MIN_VALUE, Number.MIN_VALUE, Number.MIN_VALUE);
+          this.rootMesh = new AbstractMesh("assetRootMesh", scene);
+          this._pivotMesh = new AbstractMesh("pivotMesh", scene);
 
-          scene.meshes.forEach((d) => {
-            const scaling = Vector3.Zero();
-            d.getWorldMatrix().decompose(scaling, undefined, undefined);
+          this._pivotMesh.parent = this.rootMesh;
+          // rotate 180, gltf fun
+          this._pivotMesh.rotation.y += Math.PI;
 
-            const bMinimum = d.getBoundingInfo()?.minimum.multiply(scaling);
-            const bMaximum = d.getBoundingInfo()?.maximum.multiply(scaling);
-
-            if (!bMinimum || !bMaximum) { return; }
-
-            maximum.x = Math.max(bMaximum.x, maximum.x);
-            maximum.y = Math.max(bMaximum.y, maximum.y);
-            maximum.z = Math.max(bMaximum.z, maximum.z);
-
-            minimum.x = Math.min(bMinimum.x, minimum.x);
-            minimum.y = Math.min(bMinimum.y, minimum.y);
-            minimum.z = Math.min(bMinimum.z, minimum.z);
+          meshes.forEach((mesh) => {
+            Tags.AddTagsTo(mesh, "assetMesh");
+            mesh.parent = this._pivotMesh;
           });
 
-          const center = Vector3.Center(minimum, maximum);
-          const distance = Vector3.Distance(minimum, maximum) * 2;
+          const camera = this.initCamera(scene);
 
-          camera.position = center.add(new Vector3(distance, distance, distance));
+          const boundingInfo = this.rootMesh.getHierarchyBoundingVectors(true);
+          const sizeVec = boundingInfo.max.subtract(boundingInfo.min);
+          const halfSizeVec = sizeVec.scale(0.5);
+          const center = boundingInfo.min.add(halfSizeVec);
+
           camera.setTarget(center);
+
+          const sceneDiagonalLenght = sizeVec.length();
+          if (isFinite(sceneDiagonalLenght)) {
+            camera.upperRadiusLimit = sceneDiagonalLenght * 4;
+          }
 
           if (this.assetMeshCanvas.current) {
             const view = engine.registerView(this.assetMeshCanvas.current, camera);
@@ -115,8 +141,34 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
           loadedPercent = Math.floor(dlCount * 100.0) / 100.0;
         }
         this.setState({ loadedPercent });
+      }, (scene, m, exoception) => {
+        console.log("Load Error: There was an error loading the model. " + m)
       });
     }
+  }
+
+  public initCamera(scene: Scene) {
+    const worldExtends = scene.getWorldExtends();
+    const worldSize = worldExtends.max.subtract(worldExtends.min);
+    const worldCenter = worldExtends.min.add(worldSize.scale(0.5));
+
+    let radius = worldSize.length();
+    // empty scene scenario!
+    if (!isFinite(radius)) {
+      radius = 1;
+      worldCenter.copyFromFloats(0, 0, 0);
+    }
+
+    const arcRotateCamera = new ArcRotateCamera("default camera", -(Math.PI / 2), Math.PI / 2, radius, worldCenter, scene);
+    arcRotateCamera.lowerRadiusLimit = radius * 0.01;
+    arcRotateCamera.wheelPrecision = 100 / radius;
+    const camera = arcRotateCamera;
+
+    camera.minZ = radius * 0.01;
+    camera.maxZ = radius * 1000;
+    camera.speed = radius * 0.2;
+
+    return camera
   }
 
   componentWillUnmount(): void {
