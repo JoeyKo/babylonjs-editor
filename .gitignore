@@ -35,5 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# vs code
-/.vscode/
+# Visual Studio Code
+/.vscode

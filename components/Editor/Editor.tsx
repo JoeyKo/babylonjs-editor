@@ -82,6 +82,8 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
 
   private _bindEvents(): void {
     this.selectedSceneObservable.add((s) => this.inspector?.setSelectedObject(s));
+
+    document.addEventListener("dragover", (ev) => ev.preventDefault());
   }
 
   render(): React.ReactNode {

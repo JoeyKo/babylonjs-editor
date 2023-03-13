@@ -178,7 +178,7 @@ function TreeEntity({
       open={open}
       onOpenChange={handleOpenChange}
       dropdownRender={() => (
-        <Stack w="28" bg="gray.900" color="gray.100" borderRadius={4} p={1.5} spacing={0}>
+        <Stack onClick={e => e.stopPropagation()} w="28" bg="gray.900" color="gray.100" borderRadius={4} p={1.5} spacing={0}>
           {menuItems.map(item =>
             <HStack
               p={1.5}
