@@ -1,6 +1,6 @@
 "use client"
 
-import { PickingInfo, Scene, SceneLoader, Vector3 } from "@babylonjs/core";
+import { PickingInfo, Scene, SceneLoader, Vector3, SceneSerializer, Mesh, AbstractMesh } from "@babylonjs/core";
 import { Box, Heading, HStack, Icon, Stack, Wrap, WrapItem } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -19,7 +19,8 @@ import { BiDuplicate, BiTrash } from "react-icons/bi";
 export interface IAsset {
   id: string;
   name: string;
-  filename: File;
+  filename?: File;
+  json?: any;
   extension: string;
 }
 
@@ -63,27 +64,57 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
   // Store each asset scene with id.
   public onSceneMount(id: string, scene: Scene) {
     this.sceneInstances[id] = scene;
+    for (const mesh of scene.meshes.filter(m => m.subMeshes)) {
+      const json = this.exportMeshes(mesh);
+      this.setState(prevState => {
+        return {
+          assets: [...prevState.assets, {
+            id: mesh.id,
+            name: mesh.name,
+            json: JSON.stringify(json), // write json to utf-8 file
+            extension: '.babylon'
+          }]
+        }
+      })
+    }
+  }
+
+  public exportMeshes(mesh: AbstractMesh) {
+    const json = SceneSerializer.SerializeMesh(mesh, false, false)
+
+    // Configure meshes
+    json.meshes.forEach((m: any) => {
+      delete m.geometryUniqueId;
+      delete m.materialUniqueId;
+    });
+
+    json.materials = [];
+    json.multiMaterials = [];
+
+
+    return json
   }
 
   // Update asset scene property
   public onAssetClick(asset: IAsset) {
     const scene = this.sceneInstances[asset.id];
     if (scene) {
-      console.log("Selected scene: ", scene)
+      console.log("selected asset scene: ", scene)
     }
   }
 
   public onFilesUpload = (files: File[]) => {
-    const assets = this.state.assets;
-    this.setState({
-      assets: [...assets, ...files.map(file => {
-        return {
-          id: Tools.RandomId(),
-          name: file.name,
-          filename: file,
-          extension: Tools.GetFileExtension(file.name).toLowerCase()
-        }
-      })]
+    this.setState(prevState => {
+      return {
+        assets: [...prevState.assets, ...files.map(file => {
+          return {
+            id: Tools.RandomId(),
+            name: file.name,
+            filename: file,
+            extension: Tools.GetFileExtension(file.name).toLowerCase()
+          }
+        })]
+      }
     })
   }
 
@@ -199,8 +230,9 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
                           name={asset.name}
                           filename={asset.filename}
                           editor={this.props.editor}
+                          json={asset.json}
                           onSceneMount={scene => this.onSceneMount(asset.id, scene)}
-                        /> : <AssetTexture name={asset.name} filename={asset.filename} />}
+                        /> : <AssetTexture name={asset.name} filename={asset.filename as File} />}
                     </WrapItem>
                   </Dropdown>
                 ))}

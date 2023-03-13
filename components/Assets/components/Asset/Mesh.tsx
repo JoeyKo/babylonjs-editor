@@ -8,7 +8,9 @@ import {
   BRDFTextureTools,
   ArcRotateCamera,
   AbstractMesh,
-  Tags
+  Tags,
+  Node,
+  Mesh
 } from "@babylonjs/core";
 import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
@@ -24,7 +26,8 @@ type IAssetMeshStates = {
 type IAssetMeshProps = {
   editor: Editor;
   name: string;
-  filename: File;
+  filename?: File;
+  json?: any;
   onSceneMount: (scene: Scene) => void;
 }
 
@@ -71,18 +74,8 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       envTexture.name = "studio env"
       this.scene.environmentTexture = envTexture;
 
-      SceneLoader.ImportMesh("", "", this.props.filename, scene, async (meshes, particleSystems, skeletons, animationGroups, transformNodes, geometries, lights) => {
+      SceneLoader.ImportMesh("", "", this.props.filename ?? this.props.json, scene, async (meshes, particleSystems, skeletons, animationGroups, transformNodes, geometries, lights) => {
         animationGroups.forEach(animationGroup => animationGroup.stop())
-        // console.log(scene.meshes
-        //   .filter((m) => !m._masterMesh))
-        // const materials = scene.materials;
-        // const textures = scene.textures;
-        // console.log(transformNodes.map(transformNode => transformNode.serialize()))
-        // // console.log(geometries.map(geometry => geometry.serialize()))
-        // console.log(geometries.map(geometry => geometry.serializeVerticeData())) // extract geometreis files
-        // console.log(meshes.map(mesh => mesh.serialize()))
-        // console.log(materials.filter(material => material !== scene.defaultMaterial).map(material => material.serialize()))
-        // console.log(textures.filter(texture => texture !== envTexture && texture !== BRDFTextureTools.GetEnvironmentBRDFTexture(scene)).map(material => material.serialize()))
 
         // meshes
         // delete m.geometryUniqueId;
