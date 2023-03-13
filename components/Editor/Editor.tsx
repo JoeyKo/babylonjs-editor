@@ -7,7 +7,7 @@ import Preview from '@/components/Preview';
 import { Engine, Nullable, Observable, Scene } from '@babylonjs/core';
 import React, { PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import Assets from '@/components/Assets';
+import Assets from '@/components/Assets/Asset';
 import { createStandaloneToast } from '@chakra-ui/toast'
 import { SceneUtils } from './scene/utils';
 
@@ -58,7 +58,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
   }
 
   public createAssetRenderEngine() {
-    return new Engine(document.createElement("canvas"), false, {}, false);
+    return new Engine(document.createElement("canvas"), false, {}, true);
   }
 
   public onSceneMount = (scene: Scene) => {

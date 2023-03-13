@@ -3,20 +3,19 @@
 import Editor from "@/components/Editor";
 import { Nullable } from "@/utils/types";
 import {
-  HemisphericLight,
-  Scene, Vector3, Color4, CubeTexture, SceneLoader,
-  BRDFTextureTools,
+  Scene,
+  Color4,
+  SceneLoader,
   ArcRotateCamera,
   AbstractMesh,
-  Tags,
-  Node,
-  Mesh
+  StandardMaterial,
+  Color3,
 } from "@babylonjs/core";
 import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
 import { Box, Progress, Stack, Text } from "@chakra-ui/react";
 import { SceneUtils } from "@/components/Editor/scene/utils";
-import { MdShapeLine } from "react-icons/md";
+import { IAssetType } from "../../Asset";
 
 type IAssetMeshStates = {
   loadedPercent: number;
@@ -26,8 +25,8 @@ type IAssetMeshStates = {
 type IAssetMeshProps = {
   editor: Editor;
   name: string;
-  filename?: File;
-  json?: any;
+  filename: File;
+  type: IAssetType
   onSceneMount: (scene: Scene) => void;
 }
 
@@ -45,6 +44,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
   public sceneUtils: Nullable<SceneUtils> = null;
   public rootMesh: Nullable<AbstractMesh> = null;
   private _pivotMesh: Nullable<AbstractMesh> = null;
+  private _renderFunction: () => void = () => {};
 
   constructor(props: IAssetMeshProps) {
     super(props);
@@ -67,14 +67,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       this.scene.clearColor = new Color4(0, 0, 0, 0);
       this.scene.defaultMaterial.backFaceCulling = false;
 
-      const light = new HemisphericLight("AssetsHelperLight", new Vector3(0, 1, 0), this.scene);
-      light.doNotSerialize = true;
-
-      const envTexture = CubeTexture.CreateFromPrefilteredData("/textures/studio.env", this.scene);
-      envTexture.name = "studio env"
-      this.scene.environmentTexture = envTexture;
-
-      SceneLoader.ImportMesh("", "", this.props.filename ?? this.props.json, scene, async (meshes, particleSystems, skeletons, animationGroups, transformNodes, geometries, lights) => {
+      SceneLoader.ImportMesh("", "", this.props.filename, scene, async (meshes, particleSystems, skeletons, animationGroups, transformNodes, geometries, lights) => {
         animationGroups.forEach(animationGroup => animationGroup.stop())
 
         // meshes
@@ -94,10 +87,20 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
           this._pivotMesh.rotation.y += Math.PI;
 
           meshes.forEach((mesh) => {
+            mesh.freezeWorldMatrix();
+            mesh.doNotSyncBoundingInfo = true;
             if (!mesh.parent) {
               mesh.parent = this._pivotMesh;
             }
           });
+
+          const defaultMaterial = scene.materials[0];
+          if (defaultMaterial instanceof StandardMaterial) {
+            defaultMaterial.emissiveColor = new Color3(1, 1, 1)
+          }
+
+          scene.freezeActiveMeshes();
+          scene.freezeMaterials();
 
           const camera = this.initCamera(scene);
 
@@ -107,7 +110,6 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
           const center = boundingInfo.min.add(halfSizeVec);
 
           camera.setTarget(center);
-
 
           const sceneDiagonalLenght = sizeVec.length();
           if (isFinite(sceneDiagonalLenght)) {

@@ -16,12 +16,20 @@ import { Nullable } from "@/utils/types";
 import { Dropdown } from "antd";
 import { BiDuplicate, BiTrash } from "react-icons/bi";
 
+export enum IAssetType {
+  MODELSROUCE = 'model_source',
+  MODEL = 'model',
+  MESH = 'mesh',
+  MATERIAL = 'material',
+  TEXTURE = 'texture',
+}
+
 export interface IAsset {
   id: string;
   name: string;
-  filename?: File;
-  json?: any;
+  filename: File;
   extension: string;
+  type: IAssetType
 }
 
 interface INodesProps {
@@ -61,22 +69,31 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
     }
   }
 
+  // 1. serve parse file to meshes, materials and textures.
+  // 2. offscreen canvas to generate model file. (compitable) hidden canvas to generate model file.
   // Store each asset scene with id.
-  public onSceneMount(id: string, scene: Scene) {
-    this.sceneInstances[id] = scene;
-    for (const mesh of scene.meshes.filter(m => m.subMeshes)) {
-      const json = this.exportMeshes(mesh);
+  public onSceneMount(asset: IAsset, scene: Scene) {
+    this.sceneInstances[asset.id] = scene;
+    if (asset.type === IAssetType.MODELSROUCE) {
       this.setState(prevState => {
         return {
-          assets: [...prevState.assets, {
-            id: mesh.id,
-            name: mesh.name,
-            json: JSON.stringify(json), // write json to utf-8 file
-            extension: '.babylon'
-          }]
+          assets: [...prevState.assets, ...scene.meshes.filter(m => m.subMeshes).map(m => {
+            const json = this.exportMeshes(m);
+            return {
+              id: m.id,
+              name: m.name,
+              filename: new File([JSON.stringify(json)], m.name + '.babylon'),
+              extension: '.babylon',
+              type: IAssetType.MESH
+            }
+          })]
         }
-      })
+      });
     }
+
+    setTimeout(() => {
+      scene.getEngine().stopRenderLoop(() => { scene.render() });
+    }, 100);
   }
 
   public exportMeshes(mesh: AbstractMesh) {
@@ -90,7 +107,6 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
 
     json.materials = [];
     json.multiMaterials = [];
-
 
     return json
   }
@@ -111,7 +127,8 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
             id: Tools.RandomId(),
             name: file.name,
             filename: file,
-            extension: Tools.GetFileExtension(file.name).toLowerCase()
+            extension: Tools.GetFileExtension(file.name).toLowerCase(),
+            type: IAssetType.MODELSROUCE
           }
         })]
       }
@@ -221,8 +238,8 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
                       }}
                       onClick={() => this.onAssetClick(asset)}
                       draggable
-                      onDragStart={(e) => this.dragStart(asset)}
-                      onDragEnd={(e) => this.dragEnd()}
+                      onDragStart={() => this.dragStart(asset)}
+                      onDragEnd={() => this.dragEnd()}
                     >
 
                       {AssetMesh.MESH_EXTENSIONS.includes(asset.extension) ?
@@ -230,8 +247,8 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
                           name={asset.name}
                           filename={asset.filename}
                           editor={this.props.editor}
-                          json={asset.json}
-                          onSceneMount={scene => this.onSceneMount(asset.id, scene)}
+                          type={asset.type}
+                          onSceneMount={scene => this.onSceneMount(asset, scene)}
                         /> : <AssetTexture name={asset.name} filename={asset.filename as File} />}
                     </WrapItem>
                   </Dropdown>
