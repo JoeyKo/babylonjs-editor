@@ -90,10 +90,6 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
         }
       });
     }
-
-    setTimeout(() => {
-      scene.getEngine().stopRenderLoop(() => { scene.render() });
-    }, 100);
   }
 
   public exportMeshes(mesh: AbstractMesh) {
