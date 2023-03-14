@@ -2,9 +2,9 @@
 
 import { Box, Flex, Heading, HStack, Spinner } from '@chakra-ui/react';
 import { Inspector } from '@/components/Inspectors/Inspector';
-import Entities from '@/components/Entities';
-import Preview from '@/components/Preview';
-import { Engine, Nullable, Observable, Scene } from '@babylonjs/core';
+import Entities from '@/components/Entities/Entity';
+import Preview from '@/components/Preview/Preview';
+import { Engine, Nullable, Observable, Scene, Skeleton, Sound, SubMesh, Node, IParticleSystem, AbstractMesh } from '@babylonjs/core';
 import React, { PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import Assets from '@/components/Assets/Asset';
@@ -15,6 +15,7 @@ import { SceneUtils } from './scene/utils';
 import '@/components/Inspectors/Scene/SceneInspector';
 
 import styles from './index.module.css';
+import Entity from '@/components/Entities/Entity';
 
 const { ToastContainer } = createStandaloneToast()
 
@@ -32,11 +33,22 @@ type IEditorProps = {
 export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
   public scene: Nullable<Scene> = null;
   public sceneUtils: Nullable<SceneUtils> = null;
+  public entity: Nullable<Entity> = null;
+  public preview: Nullable<Preview> = null;
   public inspector: Nullable<Inspector> = null;
+
+  public editorInitializedObservable: Observable<void> = new Observable<void>();
+  public selectedNodeObservable: Observable<Node> = new Observable<Node>();
+  public selectedSubMeshObservable: Observable<SubMesh> = new Observable<SubMesh>();
   public selectedSceneObservable: Observable<Scene> = new Observable<Scene>();
+  public selectedSoundObservable: Observable<Sound> = new Observable<Sound>();
+  public selectedSkeletonObservable: Observable<Skeleton> = new Observable<Skeleton>();
+  public selectedParticleSystemObservable: Observable<IParticleSystem> = new Observable<IParticleSystem>();
+
+  public removedNodeObservable: Observable<Node> = new Observable<Node>();
+
   // Asset engine for multiple scenes
   public assetRenderEngine: Nullable<Engine> = null;
-  public removedNodeObservable: Observable<Node> = new Observable<Node>();
 
   constructor(props: IEditorProps) {
     super(props);
@@ -70,8 +82,10 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
 
     this._bindEvents();
 
-    this.selectedSceneObservable.notifyObservers(this.scene!);
-    
+    // Notify!
+    this.editorInitializedObservable.notifyObservers();
+    this.selectedSceneObservable.notifyObservers(this.scene);
+
     // Create asset babylonjs engine
     this.assetRenderEngine = this.createAssetRenderEngine();
   }
@@ -81,7 +95,22 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
   }
 
   private _bindEvents(): void {
-    this.selectedSceneObservable.add((s) => this.inspector?.setSelectedObject(s));
+    // Editor events coordinator
+    this.selectedNodeObservable.add((o, ev) => {
+      this.inspector?.setSelectedObject(o);
+      this.preview?.gizmo?.setAttachedNode(o);
+    });
+    this.selectedSubMeshObservable.add((o, ev) => {
+      this.inspector?.setSelectedObject(o);
+      this.preview?.gizmo?.setAttachedNode(o.getMesh());
+
+    });
+    this.selectedParticleSystemObservable.add((o, ev) => {
+      this.inspector?.setSelectedObject(o);
+      if (o.emitter instanceof AbstractMesh) {
+        this.preview?.gizmo?.setAttachedNode(o.emitter);
+      }
+    });
 
     document.addEventListener("dragover", (ev) => ev.preventDefault());
   }
