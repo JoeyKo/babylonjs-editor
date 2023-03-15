@@ -98,7 +98,7 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
           left="50%"
           transform={"translateX(-50%)"}
         >
-          <Toolbar editor={this._editor} />
+          <Toolbar editor={this._editor} gizmoType={this.state.gizmoType} />
         </Box>
         <canvas ref={this.renderCanvas} className={styles.renderCanvas}></canvas>
       </Box>

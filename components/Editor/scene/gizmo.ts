@@ -101,7 +101,7 @@ export class SceneGizmo {
 
       if (this._currentGizmo) {
           this._currentGizmo.snapDistance = this._step;
-          this._currentGizmo.scaleRatio = 2.5;
+          this._currentGizmo.scaleRatio = 1.5;
 
           this._currentGizmo.onDragStartObservable.add(() => {
               if (!this._currentGizmo?.attachedMesh) { return; }

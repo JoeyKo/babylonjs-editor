@@ -1,12 +1,12 @@
 import { Scene } from "@babylonjs/core";
 import { ReactNode } from "react";
-import InspectorNumber from "../../Editor/inspector/fields/InspectorNumber";
 import { IScriptInspectorState, ScriptInspector } from "../Script/ScriptInspector";
 import { Inspector } from "../Inspector";
-import { InspectorSection } from "@/components/Editor/inspector/fields/InspectorSection";
 import { Box, Stack } from "@chakra-ui/react";
+import { InspectorSection } from "@/components/Editor/inspector/fields/InspectorSection";
 import InspectorInput from "@/components/Editor/inspector/fields/InspectorInput";
 import { InspectorColorPicker } from "@/components/Editor/inspector/fields/InspectorColorPicker";
+import { InspectorNumber } from "@/components/Editor/inspector/fields/InspectorNumber";
 
 export class SceneInspector extends ScriptInspector<Scene, IScriptInspectorState>  {
 
@@ -16,10 +16,12 @@ export class SceneInspector extends ScriptInspector<Scene, IScriptInspectorState
         <Box px={2} pt={1.5}>
           <InspectorInput label="场景名" />
         </Box>
-        <InspectorSection title={"渲染"}>
+        <InspectorSection title={"颜色"}>
           <InspectorColorPicker object={this.selectedObject} property={"clearColor"} label={"背景色"} />
           <InspectorColorPicker object={this.selectedObject} property="ambientColor" label="环境色" />
-          <InspectorNumber label="最大灯光数" />
+        </InspectorSection>
+        <InspectorSection title="环境">
+          <InspectorNumber object={this.selectedObject} property="environmentIntensity" label="强度" step={0.01} />
         </InspectorSection>
       </Stack>
     )
