@@ -13,14 +13,26 @@ type IEntitiesProps = {
 }
 
 type IEntitiesState = {
-
+  filter: string,
+   nodes: any[];
+   selectedNodes: any[];
 }
 
-export default class Entities extends PureComponent<IEntitiesProps, IEntitiesState> {
+export default class Entity extends PureComponent<IEntitiesProps, IEntitiesState> {
+  public lastSelectedObject: any;
+
+  private _editor: Editor;
+
   constructor(props: IEntitiesProps) {
     super(props);
 
+    this._editor = props.editor;
+    this._editor.entity = this;
+
     this.state = {
+      filter: "",
+      nodes: [],
+      selectedNodes: [],
     }
   }
 
