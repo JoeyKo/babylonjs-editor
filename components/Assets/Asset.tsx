@@ -1,6 +1,6 @@
 "use client"
 
-import { PickingInfo, Scene, SceneLoader, Vector3, SceneSerializer, Mesh, AbstractMesh } from "@babylonjs/core";
+import { PickingInfo, Scene, SceneLoader, Vector3, SceneSerializer, AbstractMesh } from "@babylonjs/core";
 import { Box, Heading, HStack, Icon, Stack, Wrap, WrapItem } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -15,6 +15,7 @@ import AssetTexture from "./components/Asset/Texture";
 import { Nullable } from "@/utils/types";
 import { Dropdown } from "antd";
 import { BiDuplicate, BiTrash } from "react-icons/bi";
+import FileAPI from "@/api/file";
 
 export enum IAssetType {
   MODELSROUCE = 'model_source',
@@ -27,7 +28,7 @@ export enum IAssetType {
 export interface IAsset {
   id: string;
   name: string;
-  filename: File;
+  filename: File | string;
   extension: string;
   type: IAssetType
 }
@@ -69,27 +70,25 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
     }
   }
 
-  // 1. serve parse file to meshes, materials and textures.
-  // 2. offscreen canvas to generate model file. (compitable) hidden canvas to generate model file.
   // Store each asset scene with id.
   public onSceneMount(asset: IAsset, scene: Scene) {
     this.sceneInstances[asset.id] = scene;
-    if (asset.type === IAssetType.MODELSROUCE) {
-      this.setState(prevState => {
-        return {
-          assets: [...prevState.assets, ...scene.meshes.filter(m => m.subMeshes).map(m => {
-            const json = this.exportMeshes(m);
-            return {
-              id: m.id,
-              name: m.name,
-              filename: new File([JSON.stringify(json)], m.name + '.babylon'),
-              extension: '.babylon',
-              type: IAssetType.MESH
-            }
-          })]
-        }
-      });
-    }
+    // if (asset.type === IAssetType.MODELSROUCE) {
+    //   this.setState(prevState => {
+    //     return {
+    //       assets: [...prevState.assets, ...scene.meshes.filter(m => m.subMeshes).map(m => {
+    //         const json = this.exportMeshes(m);
+    //         return {
+    //           id: m.id,
+    //           name: m.name,
+    //           filename: new File([JSON.stringify(json)], m.name + '.babylon'),
+    //           extension: '.babylon',
+    //           type: IAssetType.MESH
+    //         }
+    //       })]
+    //     }
+    //   });
+    // }
   }
 
   public exportMeshes(mesh: AbstractMesh) {
@@ -97,6 +96,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
 
     // Configure meshes
     json.meshes.forEach((m: any) => {
+      delete m.materialId; // just for mesh render
       delete m.geometryUniqueId;
       delete m.materialUniqueId;
     });
@@ -115,20 +115,30 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
     }
   }
 
-  public onFilesUpload = (files: File[]) => {
-    this.setState(prevState => {
-      return {
-        assets: [...prevState.assets, ...files.map(file => {
-          return {
+  public onFilesUpload = async (files: File[]) => {
+    const formdata = new FormData()
+    files.forEach(file => formdata.append('files', file));
+
+    const filesRes = await FileAPI.uploadFiles(formdata)
+    console.log(filesRes)
+
+    for (const name in filesRes) {
+      const meshes = filesRes[name];
+      const mesh = meshes[0];
+      const Nfile = new File([JSON.stringify(mesh)], name);
+
+      this.setState(prevState => {
+        return {
+          assets: [...prevState.assets, {
             id: Tools.RandomId(),
-            name: file.name,
-            filename: file,
-            extension: Tools.GetFileExtension(file.name).toLowerCase(),
-            type: IAssetType.MODELSROUCE
-          }
-        })]
-      }
-    })
+            name: mesh.meshes[0].name,
+            filename: Nfile,
+            extension: Tools.GetFileExtension(name).toLowerCase(),
+            type: IAssetType.MODEL
+          }]
+        }
+      })
+    }
   }
 
   public async addOrUpdateMeshesInScene(asset: IAsset, pickInfo?: PickingInfo) {

@@ -10,6 +10,7 @@ import {
   AbstractMesh,
   StandardMaterial,
   Color3,
+  Engine,
 } from "@babylonjs/core";
 import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
@@ -25,7 +26,7 @@ type IAssetMeshStates = {
 type IAssetMeshProps = {
   editor: Editor;
   name: string;
-  filename: File;
+  filename: File | string;
   type: IAssetType
   onSceneMount: (scene: Scene) => void;
 }
@@ -61,7 +62,14 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
 
     const engine = this.editor.assetRenderEngine;
     if (engine) {
-      const scene = new Scene(engine);
+      setTimeout(() => {
+        this.initScene(engine)
+      }, 100);
+    }
+  }
+
+  public initScene(engine: Engine) {
+    const scene = new Scene(engine);
 
       this.scene = scene;
       this.scene.clearColor = new Color4(0, 0, 0, 0);
@@ -70,12 +78,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       SceneLoader.ImportMesh("", "", this.props.filename, scene, async (meshes, particleSystems, skeletons, animationGroups, transformNodes, geometries, lights) => {
         animationGroups.forEach(animationGroup => animationGroup.stop())
 
-        // meshes
-        // delete m.geometryUniqueId;
-        // delete m.materialUniqueId;
-
         scene.executeWhenReady(async () => {
-          await new Promise<void>((resolve) => setTimeout(() => resolve(), 100));
 
           this.setState({ loaded: true });
 
@@ -86,6 +89,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
           // rotate 180, gltf fun
           this._pivotMesh.rotation.y += Math.PI;
 
+          console.log(meshes)
           meshes.forEach((mesh) => {
             mesh.freezeWorldMatrix();
             mesh.doNotSyncBoundingInfo = true;
@@ -116,11 +120,6 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
             camera.upperRadiusLimit = sceneDiagonalLenght * 4;
           }
 
-          // setTimeout(() => {
-          //   this.rootMesh?.dispose(true)
-          //   this._pivotMesh?.dispose(true);
-          // }, 100);
-
           if (this.assetMeshCanvas.current) {
             const view = engine.registerView(this.assetMeshCanvas.current, camera);
 
@@ -147,8 +146,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       }, (scene, m, exoception) => {
         console.log("Load Error: There was an error loading the model. " + m)
       });
-    }
-  }
+  } 
 
   public initCamera(scene: Scene) {
     const worldExtends = scene.getWorldExtends();
