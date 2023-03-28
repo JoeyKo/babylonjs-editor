@@ -46,7 +46,6 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
     this._editor = props.editor;
 
     this._editor.preview = this;
-    this._editor.editorInitializedObservable.addOnce(() => this._createPicker());
 
     this.state = {
       gizmoType: GizmoType.None,
@@ -59,6 +58,8 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
     setTimeout(() => {
       this.init();
     }, 0);
+    
+    this._editor.editorInitializedObservable.addOnce(() => this._createPicker());
   }
 
   public init() {
@@ -73,9 +74,12 @@ export default class Preview extends PureComponent<IPreviewProps, IPreviewStates
 
     const scene = new Scene(engine);
     const camera = new ArcRotateCamera("Editor Camera", 0, 0, 5, Vector3.Zero(), scene);
+    camera.minZ = 0.1;
     camera.attachControl(this.renderCanvas.current, true);
+
     const light = new HemisphericLight("Editor Light", new Vector3(0, 1, 0), scene);
     light.intensity = 0.7;
+
     const sphere = CreateBox("Box", { size: 1 }, scene);
     sphere.position = Vector3.Zero();
     this.props.onSceneMount(scene);

@@ -16,6 +16,7 @@ import { Nullable } from "@/utils/types";
 import { Dropdown } from "antd";
 import { BiDuplicate, BiTrash } from "react-icons/bi";
 import FileAPI from "@/api/file";
+import AssetMaterial from "./components/Asset/Material";
 
 export enum IAssetType {
   MODELSROUCE = 'model_source',
@@ -28,8 +29,7 @@ export enum IAssetType {
 export interface IAsset {
   id: string;
   name: string;
-  filename: File | string;
-  extension: string;
+  filename: any;
   type: IAssetType
 }
 
@@ -73,22 +73,6 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
   // Store each asset scene with id.
   public onSceneMount(asset: IAsset, scene: Scene) {
     this.sceneInstances[asset.id] = scene;
-    // if (asset.type === IAssetType.MODELSROUCE) {
-    //   this.setState(prevState => {
-    //     return {
-    //       assets: [...prevState.assets, ...scene.meshes.filter(m => m.subMeshes).map(m => {
-    //         const json = this.exportMeshes(m);
-    //         return {
-    //           id: m.id,
-    //           name: m.name,
-    //           filename: new File([JSON.stringify(json)], m.name + '.babylon'),
-    //           extension: '.babylon',
-    //           type: IAssetType.MESH
-    //         }
-    //       })]
-    //     }
-    //   });
-    // }
   }
 
   public exportMeshes(mesh: AbstractMesh) {
@@ -116,36 +100,58 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
   }
 
   public onFilesUpload = async (files: File[]) => {
-    const formdata = new FormData()
+    // Upload files
+    const formdata = new FormData();
     files.forEach(file => formdata.append('files', file));
+    const filesRes = await FileAPI.uploadFiles(formdata);
 
-    const filesRes = await FileAPI.uploadFiles(formdata)
-    console.log(filesRes)
+    const pendingAssets: IAsset[] = [];
 
     for (const name in filesRes) {
-      const meshes = filesRes[name];
-      const mesh = meshes[0];
-      const Nfile = new File([JSON.stringify(mesh)], name);
+      const meshes = filesRes[name].meshes ?? [];
+      const materials = filesRes[name].materials ?? [];
+      const textures = filesRes[name].textures ?? [];
 
-      this.setState(prevState => {
-        return {
-          assets: [...prevState.assets, {
-            id: Tools.RandomId(),
-            name: mesh.meshes[0].name,
-            filename: Nfile,
-            extension: Tools.GetFileExtension(name).toLowerCase(),
-            type: IAssetType.MODEL
-          }]
-        }
-      })
+      for (const mesh of meshes) {
+        const Nfile = new File([JSON.stringify(mesh)], mesh.meshes[0].name + ".babylon");
+
+        pendingAssets.push({
+          id: Tools.RandomId(),
+          name: mesh.meshes[0].name,
+          filename: Nfile,
+          type: IAssetType.MESH
+        })
+      }
+
+      for (const material of materials) {
+        pendingAssets.push({
+          id: Tools.RandomId(),
+          name: material.name,
+          filename: material,
+          type: IAssetType.MATERIAL
+        })
+      }
+
+      console.log(textures)
+      for (const texture of textures) {
+        pendingAssets.push({
+          id: Tools.RandomId(),
+          name: texture.name,
+          filename: texture.url,
+          type: IAssetType.TEXTURE
+        })
+      }
     }
+
+    this.setState(prevState => {
+      return {
+        assets: [...prevState.assets, ...pendingAssets]
+      }
+    });
   }
 
   public async addOrUpdateMeshesInScene(asset: IAsset, pickInfo?: PickingInfo) {
     import("@babylonjs/loaders");
-
-    const extension = Tools.GetFileExtension(asset.name).toLowerCase();
-    const isGltf = extension === ".glb" || extension === ".gltf";
 
     // Load and stop all animations
     const result = await SceneLoader.ImportMeshAsync("", "", asset.filename, this.editor.scene!);
@@ -247,15 +253,21 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
                       onDragStart={() => this.dragStart(asset)}
                       onDragEnd={() => this.dragEnd()}
                     >
-
-                      {AssetMesh.MESH_EXTENSIONS.includes(asset.extension) ?
+                      {IAssetType.MESH === asset.type ?
                         <AssetMesh
                           name={asset.name}
                           filename={asset.filename}
                           editor={this.props.editor}
-                          type={asset.type}
                           onSceneMount={scene => this.onSceneMount(asset, scene)}
-                        /> : <AssetTexture name={asset.name} filename={asset.filename as File} />}
+                        /> :
+                        (IAssetType.MATERIAL === asset.type ?
+                          <AssetMaterial
+                            name={asset.name}
+                            filename={asset.filename}
+                            editor={this.props.editor}
+                            onSceneMount={scene => this.onSceneMount(asset, scene)}
+                          />
+                          : <AssetTexture name={asset.name} filename={asset.filename} />)}
                     </WrapItem>
                   </Dropdown>
                 ))}

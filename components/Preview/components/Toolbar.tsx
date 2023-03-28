@@ -28,7 +28,7 @@ export default class Toolbar extends PureComponent<IToolbarProps, IToolbarStates
   render(): ReactNode {
     return (
       <HStack spacing={4}>
-        <IconButton variant='filled' as={FiMove} size='2xs' aria-label={"移动"}
+        <IconButton variant='filled' size='2xs' aria-label={"移动"} as={FiMove}
           color={this.props.gizmoType === GizmoType.Position ? "blue.500" : undefined}
           onClick={() => this._editor.preview?.setGizmoType(GizmoType.Position)}
         />

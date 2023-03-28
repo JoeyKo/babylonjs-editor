@@ -26,19 +26,12 @@ type IAssetMeshStates = {
 type IAssetMeshProps = {
   editor: Editor;
   name: string;
-  filename: File | string;
-  type: IAssetType
+  filename: File;
   onSceneMount: (scene: Scene) => void;
 }
 
 
 export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMeshStates> {
-  public static MESH_EXTENSIONS: string[] = [
-    ".fbx",
-    ".gltf", ".glb",
-    ".babylon",
-    ".obj", ".stl",
-  ];
   public editor: Editor;
   public assetMeshCanvas = createRef<HTMLCanvasElement>();
   public scene: Nullable<Scene> = null;
@@ -89,7 +82,6 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
           // rotate 180, gltf fun
           this._pivotMesh.rotation.y += Math.PI;
 
-          console.log(meshes)
           meshes.forEach((mesh) => {
             mesh.freezeWorldMatrix();
             mesh.doNotSyncBoundingInfo = true;
@@ -129,6 +121,8 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
               }
             });
 
+            this.assetMeshCanvas.current.setAttribute('width', "64px")
+            this.assetMeshCanvas.current.setAttribute('height', "64px")
             this.props.onSceneMount(scene);
           }
         });
@@ -160,7 +154,7 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
       worldCenter.copyFromFloats(0, 0, 0);
     }
 
-    const arcRotateCamera = new ArcRotateCamera("default camera", -(Math.PI / 2), Math.PI / 2, radius, worldCenter, scene);
+    const arcRotateCamera = new ArcRotateCamera("default camera", -(Math.PI / 2), Math.PI / 4, radius, worldCenter, scene);
     arcRotateCamera.lowerRadiusLimit = radius * 0.01;
     arcRotateCamera.wheelPrecision = 100 / radius;
     const camera = arcRotateCamera;
