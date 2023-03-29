@@ -1,6 +1,16 @@
 import { Tools as BabylonTools } from "@babylonjs/core";
 
 class Tools {
+  
+  public static MESH_EXTENSIONS: string[] = [
+    'fbx',
+    'gltf',
+    'glb',
+    'babylon',
+    'obj',
+    'stl',
+  ];
+
   /**
    * Returns the name of the constructor of the given object.
    * @param object the object to return its constructor name.
@@ -25,7 +35,13 @@ class Tools {
   }
 
   public static GetFileExtension(filename: string): string {
-    return "." + (filename.split('.').pop() ?? "");
+    return filename.split('.').pop() ?? '';
+  }
+
+  public static Is3DModelFile(filename: string) {
+    return Tools.MESH_EXTENSIONS.includes(
+      this.GetFileExtension(filename).toLocaleLowerCase(),
+    );
   }
 }
 

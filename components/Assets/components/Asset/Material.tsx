@@ -4,7 +4,6 @@ import {
   HemisphericLight,
   Scene, Vector3, Color4, MeshBuilder, Material, ArcRotateCamera
 } from "@babylonjs/core";
-import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
 import { Box, Progress, Stack, Text } from "@chakra-ui/react";
 

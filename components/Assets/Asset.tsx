@@ -17,19 +17,21 @@ import { Dropdown } from "antd";
 import { BiDuplicate, BiTrash } from "react-icons/bi";
 import FileAPI from "@/api/file";
 import AssetMaterial from "./components/Asset/Material";
+import AssetBianry from "./components/Asset/Binary";
 
 export enum IAssetType {
-  MODELSROUCE = 'model_source',
+  MODELSROUCE = 'modelSource',
   MODEL = 'model',
   MESH = 'mesh',
   MATERIAL = 'material',
   TEXTURE = 'texture',
+  BINARY = 'binary',
 }
 
 export interface IAsset {
   id: string;
   name: string;
-  filename: any;
+  filename?: any;
   type: IAssetType
 }
 
@@ -96,9 +98,19 @@ export default class Assets extends PureComponent<IAssetsProps, IAssetsState> {
     const pendingAssets: IAsset[] = [];
 
     for (const name in filesRes) {
+      const modelSources = filesRes[name].modelSources ?? [];
       const meshes = filesRes[name].meshes ?? [];
       const materials = filesRes[name].materials ?? [];
       const textures = filesRes[name].textures ?? [];
+      const binaries = filesRes[name].binaries ?? [];
+   
+      for (const modelSource of modelSources) {
+        pendingAssets.push({
+          id: Tools.RandomId(),
+          name: modelSource.name,
+          type: IAssetType.MODELSROUCE
+        })
+      }
 
       for (const mesh of meshes) {
         delete mesh.meshes[0].materialId;
@@ -113,7 +125,6 @@ export default class Assets extends PureComponent<IAssetsProps, IAssetsState> {
       }
 
       for (const material of materials) {
-        console.log(material)
         pendingAssets.push({
           id: Tools.RandomId(),
           name: material.name,
@@ -128,6 +139,14 @@ export default class Assets extends PureComponent<IAssetsProps, IAssetsState> {
           name: texture.name,
           filename: texture.url,
           type: IAssetType.TEXTURE
+        })
+      }
+
+      for (const binary of binaries) {
+        pendingAssets.push({
+          id: Tools.RandomId(),
+          name: binary.name,
+          type: IAssetType.BINARY
         })
       }
     }
@@ -202,6 +221,7 @@ export default class Assets extends PureComponent<IAssetsProps, IAssetsState> {
               <Wrap p={2} spacing={2}>
                 {this.state.assets.map(asset => (
                   <AssetItem
+                    draggable={asset.type === IAssetType.MODEL || asset.type === IAssetType.MATERIAL}
                     key={asset.id}
                     editor={this.props.editor}
                     asset={asset}
@@ -221,6 +241,7 @@ export default class Assets extends PureComponent<IAssetsProps, IAssetsState> {
 }
 
 interface IAssetProps {
+  draggable: boolean;
   editor: Editor;
   asset: IAsset;
   onLoaded: (asset: IAsset, scene: Scene) => void;
@@ -247,7 +268,7 @@ class AssetItem extends PureComponent<IAssetProps, IAssetState>{
   }
 
   render(): ReactNode {
-    const { asset, onLoaded, onClick, dragStart, dragEnd } = this.props;
+    const { draggable, asset, onLoaded, onClick, dragStart, dragEnd } = this.props;
     return (
       <Dropdown
         key={asset.id}
@@ -282,7 +303,7 @@ class AssetItem extends PureComponent<IAssetProps, IAssetState>{
             bg: 'gray.900'
           }}
           onClick={() => onClick(asset)}
-          draggable
+          draggable={draggable}
           onDragStart={() => dragStart(asset)}
           onDragEnd={() => dragEnd()}
         >
@@ -299,8 +320,10 @@ class AssetItem extends PureComponent<IAssetProps, IAssetState>{
                 filename={asset.filename}
                 editor={this.props.editor}
                 onLoaded={scene => onLoaded(asset, scene)}
-              />
-              : <AssetTexture name={asset.name} filename={asset.filename} />)}
+              /> : 
+              (IAssetType.TEXTURE === asset.type ? 
+                <AssetTexture name={asset.name} filename={asset.filename} />
+                : <AssetBianry name={asset.name} type={asset.type} />))}
         </WrapItem>
       </Dropdown>
     )

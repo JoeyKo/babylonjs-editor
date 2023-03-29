@@ -16,7 +16,6 @@ import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
 import { Box, Progress, Stack, Text } from "@chakra-ui/react";
 import { SceneUtils } from "@/components/Editor/scene/utils";
-import { IAssetType } from "../../Asset";
 
 type IAssetMeshStates = {
   loadedPercent: number;
