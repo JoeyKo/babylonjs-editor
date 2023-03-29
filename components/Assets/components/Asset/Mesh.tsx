@@ -27,7 +27,7 @@ type IAssetMeshProps = {
   editor: Editor;
   name: string;
   filename: File;
-  onSceneMount: (scene: Scene) => void;
+  onLoaded: (scene: Scene) => void;
 }
 
 
@@ -38,7 +38,6 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
   public sceneUtils: Nullable<SceneUtils> = null;
   public rootMesh: Nullable<AbstractMesh> = null;
   private _pivotMesh: Nullable<AbstractMesh> = null;
-  private _renderFunction: () => void = () => {};
 
   constructor(props: IAssetMeshProps) {
     super(props);
@@ -57,97 +56,95 @@ export default class AssetMesh extends PureComponent<IAssetMeshProps, IAssetMesh
     if (engine) {
       setTimeout(() => {
         this.initScene(engine)
-      }, 100);
+      }, 300);
     }
   }
 
   public initScene(engine: Engine) {
     const scene = new Scene(engine);
 
-      this.scene = scene;
-      this.scene.clearColor = new Color4(0, 0, 0, 0);
-      this.scene.defaultMaterial.backFaceCulling = false;
+    this.scene = scene;
+    this.scene.clearColor = new Color4(0, 0, 0, 0);
+    this.scene.defaultMaterial.backFaceCulling = false;
 
-      SceneLoader.ImportMesh("", "", this.props.filename, scene, async (meshes, particleSystems, skeletons, animationGroups, transformNodes, geometries, lights) => {
-        animationGroups.forEach(animationGroup => animationGroup.stop())
+    SceneLoader.ImportMesh("", "", this.props.filename, scene, async (meshes, particleSystems, skeletons, animationGroups, transformNodes, geometries, lights) => {
+      animationGroups.forEach(animationGroup => animationGroup.stop())
 
-        scene.executeWhenReady(async () => {
+      scene.executeWhenReady(async () => {
 
-          this.setState({ loaded: true });
+        this.setState({ loaded: true });
 
-          this.rootMesh = new AbstractMesh("assetRootMesh", scene);
-          this._pivotMesh = new AbstractMesh("pivotMesh", scene);
+        this.rootMesh = new AbstractMesh("assetRootMesh", scene);
+        this._pivotMesh = new AbstractMesh("pivotMesh", scene);
 
-          this._pivotMesh.parent = this.rootMesh;
-          // rotate 180, gltf fun
-          this._pivotMesh.rotation.y += Math.PI;
+        this._pivotMesh.parent = this.rootMesh;
+        // rotate 180, gltf fun
+        this._pivotMesh.rotation.y += Math.PI;
 
-          meshes.forEach((mesh) => {
-            mesh.freezeWorldMatrix();
-            mesh.doNotSyncBoundingInfo = true;
-            if (!mesh.parent) {
-              mesh.parent = this._pivotMesh;
-            }
-          });
-
-          const defaultMaterial = scene.materials[0];
-          if (defaultMaterial instanceof StandardMaterial) {
-            defaultMaterial.emissiveColor = new Color3(1, 1, 1)
-          }
-
-          scene.freezeActiveMeshes();
-          scene.freezeMaterials();
-
-          const camera = this.initCamera(scene);
-
-          const boundingInfo = this.rootMesh.getHierarchyBoundingVectors(true);
-          const sizeVec = boundingInfo.max.subtract(boundingInfo.min);
-          const halfSizeVec = sizeVec.scale(0.5);
-          const center = boundingInfo.min.add(halfSizeVec);
-
-          camera.setTarget(center);
-
-          const sceneDiagonalLenght = sizeVec.length();
-          if (isFinite(sceneDiagonalLenght)) {
-            camera.upperRadiusLimit = sceneDiagonalLenght * 4;
-          }
-
-          if (this.assetMeshCanvas.current) {
-            const view = engine.registerView(this.assetMeshCanvas.current, camera);
-
-            engine.runRenderLoop(() => {
-              if (engine.activeView?.target === view?.target) {
-                scene.render()
-              }
-            });
-
-            this.assetMeshCanvas.current.setAttribute('width', "64px")
-            this.assetMeshCanvas.current.setAttribute('height', "64px")
-            this.props.onSceneMount(scene);
+        meshes.forEach((mesh) => {
+          if (!mesh.parent) {
+            mesh.parent = this._pivotMesh;
           }
         });
 
-        scene._checkIsReady();
-      }, evt => {
-        let loadedPercent: number = 0;
-        if (evt.lengthComputable) {
-          loadedPercent = +(evt.loaded * 100 / evt.total).toFixed();
-        } else {
-          const dlCount = evt.loaded / (1024 * 1024);
-          loadedPercent = Math.floor(dlCount * 100.0) / 100.0;
+        const defaultMaterial = scene.materials[0];
+        if (defaultMaterial instanceof StandardMaterial) {
+          defaultMaterial.emissiveColor = new Color3(1, 1, 1)
         }
-        this.setState({ loadedPercent });
-      }, (scene, m, exoception) => {
-        console.log("Load Error: There was an error loading the model. " + m)
+
+        scene.freezeActiveMeshes();
+        scene.freezeMaterials();
+
+        const camera = this.initCamera(scene);
+
+        const boundingInfo = this.rootMesh.getHierarchyBoundingVectors(true);
+        const sizeVec = boundingInfo.max.subtract(boundingInfo.min);
+        const halfSizeVec = sizeVec.scale(0.5);
+        const center = boundingInfo.min.add(halfSizeVec);
+
+        camera.setTarget(center);
+
+        const sceneDiagonalLenght = sizeVec.length();
+        if (isFinite(sceneDiagonalLenght)) {
+          camera.upperRadiusLimit = sceneDiagonalLenght * 4;
+        }
+
+        if (this.assetMeshCanvas.current) {
+          const view = engine.registerView(this.assetMeshCanvas.current, camera);
+
+          engine.runRenderLoop(() => {
+            if (engine.activeView?.target === view?.target) {
+              scene.render()
+            }
+          });
+
+          this.assetMeshCanvas.current.setAttribute('width', "64px")
+          this.assetMeshCanvas.current.setAttribute('height', "64px")
+          this.props.onLoaded(scene);
+        }
       });
-  } 
+
+      scene._checkIsReady();
+    }, evt => {
+      let loadedPercent: number = 0;
+      if (evt.lengthComputable) {
+        loadedPercent = +(evt.loaded * 100 / evt.total).toFixed();
+      } else {
+        const dlCount = evt.loaded / (1024 * 1024);
+        loadedPercent = Math.floor(dlCount * 100.0) / 100.0;
+      }
+      this.setState({ loadedPercent });
+    }, (scene, m, exoception) => {
+      console.log("Load Error: There was an error loading the model. " + m)
+    });
+  }
 
   public initCamera(scene: Scene) {
     const worldExtends = scene.getWorldExtends();
     const worldSize = worldExtends.max.subtract(worldExtends.min);
     const worldCenter = worldExtends.min.add(worldSize.scale(0.5));
 
-    let radius = worldSize.length() * 1.5;
+    let radius = worldSize.length() * 1.2;
     // empty scene scenario!
     if (!isFinite(radius)) {
       radius = 1;

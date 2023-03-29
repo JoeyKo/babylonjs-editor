@@ -33,11 +33,11 @@ export interface IAsset {
   type: IAssetType
 }
 
-interface INodesProps {
+interface IAssetsProps {
   editor: Editor;
 }
 
-interface INodesState {
+interface IAssetsState {
   assets: IAsset[];
   isContextMenuOpen: boolean;
 }
@@ -54,12 +54,14 @@ const menuItems: any[] = [
     icon: BiTrash
   },
 ];
-export default class Assets extends PureComponent<INodesProps, INodesState> {
+
+// TODO: 初次加载只渲染当前页面下的mesh material
+export default class Assets extends PureComponent<IAssetsProps, IAssetsState> {
   public sceneInstances: { [key: string]: Scene } = {};
   public editor: Editor;
   private _dropListener: Nullable<(ev: DragEvent) => void> = null;
 
-  constructor(props: INodesProps) {
+  constructor(props: IAssetsProps) {
     super(props);
 
     this.editor = props.editor;
@@ -71,28 +73,12 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
   }
 
   // Store each asset scene with id.
-  public onSceneMount(asset: IAsset, scene: Scene) {
+  public onAssetLoaded = (asset: IAsset, scene: Scene) => {
     this.sceneInstances[asset.id] = scene;
   }
 
-  public exportMeshes(mesh: AbstractMesh) {
-    const json = SceneSerializer.SerializeMesh(mesh, false, false)
-
-    // Configure meshes
-    json.meshes.forEach((m: any) => {
-      delete m.materialId; // just for mesh render
-      delete m.geometryUniqueId;
-      delete m.materialUniqueId;
-    });
-
-    json.materials = [];
-    json.multiMaterials = [];
-
-    return json
-  }
-
   // Update asset scene property
-  public onAssetClick(asset: IAsset) {
+  public onAssetClick = (asset: IAsset) => {
     const scene = this.sceneInstances[asset.id];
     if (scene) {
       console.log("selected asset scene: ", scene)
@@ -100,6 +86,8 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
   }
 
   public onFilesUpload = async (files: File[]) => {
+    if (files.length === 0) { return; }
+
     // Upload files
     const formdata = new FormData();
     files.forEach(file => formdata.append('files', file));
@@ -113,6 +101,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
       const textures = filesRes[name].textures ?? [];
 
       for (const mesh of meshes) {
+        delete mesh.meshes[0].materialId;
         const Nfile = new File([JSON.stringify(mesh)], mesh.meshes[0].name + ".babylon");
 
         pendingAssets.push({
@@ -124,6 +113,7 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
       }
 
       for (const material of materials) {
+        console.log(material)
         pendingAssets.push({
           id: Tools.RandomId(),
           name: material.name,
@@ -132,7 +122,6 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
         })
       }
 
-      console.log(textures)
       for (const texture of textures) {
         pendingAssets.push({
           id: Tools.RandomId(),
@@ -167,12 +156,12 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
     }
   }
 
-  public dragStart(item: IAsset) {
+  public dragStart = (item: IAsset) => {
     this._dropListener = this._getDropListener(item);
     this.editor.scene?.getEngine().getRenderingCanvas()?.addEventListener("drop", this._dropListener);
   }
 
-  public dragEnd() {
+  public dragEnd = () => {
     this.editor.scene?.getEngine().getRenderingCanvas()?.removeEventListener("drop", this._dropListener!);
     this._dropListener = null;
   }
@@ -190,10 +179,6 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
 
       this.addOrUpdateMeshesInScene(item, pick);
     };
-  }
-
-  private _handleContextMenuOpenChange = (isOpen: boolean) => {
-    this.setState({ isContextMenuOpen: isOpen })
   }
 
   render(): ReactNode {
@@ -216,66 +201,108 @@ export default class Assets extends PureComponent<INodesProps, INodesState> {
             <Box height="calc(100% - 32px)" overflow={"auto"}>
               <Wrap p={2} spacing={2}>
                 {this.state.assets.map(asset => (
-                  <Dropdown
+                  <AssetItem
                     key={asset.id}
-                    open={this.state.isContextMenuOpen}
-                    onOpenChange={this._handleContextMenuOpenChange}
-                    dropdownRender={() => (
-                      <Stack onClick={e => e.stopPropagation()} w="28" bg="gray.900" color="gray.100" borderRadius={4} p={1.5} spacing={0}>
-                        {menuItems.map(item =>
-                          <HStack
-                            p={1.5}
-                            align="center"
-                            borderRadius={4}
-                            cursor='pointer'
-                            fontSize="xs"
-                            _hover={{ bg: 'blue.500' }}
-                            key={item.key}
-                            onClick={() => this.setState({ isContextMenuOpen: false })}
-                          >
-                            <Icon fontSize="md" as={item.icon}></Icon>
-                            <Heading as="span" fontSize="sm">{item.label}</Heading>
-                          </HStack>
-                        )}
-                      </Stack>
-                    )} trigger={['contextMenu']}>
-                    <WrapItem
-                      w="100px"
-                      height="100px"
-                      justifyContent="center"
-                      alignItems="center"
-                      cursor={"pointer"}
-                      _hover={{
-                        bg: 'gray.900'
-                      }}
-                      onClick={() => this.onAssetClick(asset)}
-                      draggable
-                      onDragStart={() => this.dragStart(asset)}
-                      onDragEnd={() => this.dragEnd()}
-                    >
-                      {IAssetType.MESH === asset.type ?
-                        <AssetMesh
-                          name={asset.name}
-                          filename={asset.filename}
-                          editor={this.props.editor}
-                          onSceneMount={scene => this.onSceneMount(asset, scene)}
-                        /> :
-                        (IAssetType.MATERIAL === asset.type ?
-                          <AssetMaterial
-                            name={asset.name}
-                            filename={asset.filename}
-                            editor={this.props.editor}
-                            onSceneMount={scene => this.onSceneMount(asset, scene)}
-                          />
-                          : <AssetTexture name={asset.name} filename={asset.filename} />)}
-                    </WrapItem>
-                  </Dropdown>
+                    editor={this.props.editor}
+                    asset={asset}
+                    onClick={this.onAssetClick}
+                    onLoaded={this.onAssetLoaded}
+                    dragStart={this.dragStart}
+                    dragEnd={this.dragEnd}
+                  />
                 ))}
               </Wrap>
             </Box>
           </Panel>
         </PanelGroup>
       </Box >
+    )
+  }
+}
+
+interface IAssetProps {
+  editor: Editor;
+  asset: IAsset;
+  onLoaded: (asset: IAsset, scene: Scene) => void;
+  onClick: (asset: IAsset) => void;
+  dragStart: (asset: IAsset) => void;
+  dragEnd: () => void;
+}
+
+interface IAssetState {
+  isContextMenuOpen: boolean;
+}
+
+class AssetItem extends PureComponent<IAssetProps, IAssetState>{
+  constructor(props: IAssetProps) {
+    super(props);
+
+    this.state = {
+      isContextMenuOpen: false
+    }
+  }
+
+  private _handleContextMenuOpenChange = (isOpen: boolean) => {
+    this.setState({ isContextMenuOpen: isOpen })
+  }
+
+  render(): ReactNode {
+    const { asset, onLoaded, onClick, dragStart, dragEnd } = this.props;
+    return (
+      <Dropdown
+        key={asset.id}
+        open={this.state.isContextMenuOpen}
+        onOpenChange={this._handleContextMenuOpenChange}
+        dropdownRender={() => (
+          <Stack onClick={e => e.stopPropagation()} w="28" bg="gray.900" color="gray.100" borderRadius={4} p={1.5} spacing={0}>
+            {menuItems.map(item =>
+              <HStack
+                p={1.5}
+                align="center"
+                borderRadius={4}
+                cursor='pointer'
+                fontSize="xs"
+                _hover={{ bg: 'blue.500' }}
+                key={item.key}
+                onClick={() => this.setState({ isContextMenuOpen: false })}
+              >
+                <Icon fontSize="md" as={item.icon}></Icon>
+                <Heading as="span" fontSize="sm">{item.label}</Heading>
+              </HStack>
+            )}
+          </Stack>
+        )} trigger={['contextMenu']}>
+        <WrapItem
+          w="100px"
+          height="100px"
+          justifyContent="center"
+          alignItems="center"
+          cursor={"pointer"}
+          _hover={{
+            bg: 'gray.900'
+          }}
+          onClick={() => onClick(asset)}
+          draggable
+          onDragStart={() => dragStart(asset)}
+          onDragEnd={() => dragEnd()}
+        >
+          {IAssetType.MESH === asset.type ?
+            <AssetMesh
+              name={asset.name}
+              filename={asset.filename}
+              editor={this.props.editor}
+              onLoaded={scene => onLoaded(asset, scene)}
+            /> :
+            (IAssetType.MATERIAL === asset.type ?
+              <AssetMaterial
+                name={asset.name}
+                filename={asset.filename}
+                editor={this.props.editor}
+                onLoaded={scene => onLoaded(asset, scene)}
+              />
+              : <AssetTexture name={asset.name} filename={asset.filename} />)}
+        </WrapItem>
+      </Dropdown>
     )
   }
 }

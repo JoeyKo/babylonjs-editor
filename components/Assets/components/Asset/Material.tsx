@@ -2,7 +2,7 @@ import Editor from "@/components/Editor";
 import { Nullable } from "@/utils/types";
 import {
   HemisphericLight,
-  Scene, TargetCamera, Vector3, Color4, MeshBuilder, Material, ArcRotateCamera
+  Scene, Vector3, Color4, MeshBuilder, Material, ArcRotateCamera
 } from "@babylonjs/core";
 import "@babylonjs/loaders";
 import { createRef, PureComponent, ReactNode } from "react"
@@ -17,7 +17,7 @@ type IAssetMeshProps = {
   editor: Editor;
   name: string;
   filename: any;
-  onSceneMount: (scene: Scene) => void;
+  onLoaded: (scene: Scene) => void;
 }
 
 
@@ -49,7 +49,7 @@ export default class AssetMaterial extends PureComponent<IAssetMeshProps, IAsset
       new HemisphericLight("AssetsHelperLight", new Vector3(0, 1, 0), this.scene);
 
       this.setState({ loadedPercent: 50 })
-      const sphere = MeshBuilder.CreateSphere("MaterialsSphere", { segments: 32 }, this.scene);
+      const sphere = MeshBuilder.CreateSphere("MaterialsSphere", { segments: 8 }, this.scene);
 
       const material = Material.Parse(this.props.filename, this.scene, "")
       sphere.material = material;
@@ -84,7 +84,7 @@ export default class AssetMaterial extends PureComponent<IAssetMeshProps, IAsset
 
         this.assetMaterialCanvas.current.setAttribute('width', "64px")
         this.assetMaterialCanvas.current.setAttribute('height', "64px")
-        this.props.onSceneMount(scene);
+        this.props.onLoaded(scene);
       }
     }
   }
@@ -94,7 +94,7 @@ export default class AssetMaterial extends PureComponent<IAssetMeshProps, IAsset
     const worldSize = worldExtends.max.subtract(worldExtends.min);
     const worldCenter = worldExtends.min.add(worldSize.scale(0.5));
 
-    let radius = worldSize.length() * 1.5;
+    let radius = worldSize.length() * 1;
     // empty scene scenario!
     if (!isFinite(radius)) {
       radius = 1;

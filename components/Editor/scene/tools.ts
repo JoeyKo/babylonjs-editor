@@ -1,5 +1,5 @@
 import { Nullable } from "@/utils/types";
-import { ISceneLoaderAsyncResult, ISceneLoaderProgressEvent, Mesh, Scene, SceneLoader, } from "@babylonjs/core";
+import { Mesh } from "@babylonjs/core";
 import Tools from "../tools/tools";
 import { createStandaloneToast } from '@chakra-ui/toast'
 

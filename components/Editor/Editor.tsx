@@ -70,7 +70,11 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
   }
 
   public createAssetRenderEngine() {
-    return new Engine(document.createElement("canvas"), false, {}, false);
+    return new Engine(document.createElement("canvas"), false, {
+      audioEngine: false,
+      disableWebGL2Support: false,
+      powerPreference: "low-power",
+    }, false);
   }
 
   public onSceneMount = (scene: Scene) => {
