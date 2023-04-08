@@ -1,5 +1,3 @@
-"use client"
-
 import { Box, Flex, Heading, HStack, Spinner } from '@chakra-ui/react';
 import { Inspector } from '@/components/Inspectors/Inspector';
 import Entities from '@/components/Entities/Entity';
@@ -7,6 +5,7 @@ import Preview from '@/components/Preview/Preview';
 import { Engine, Nullable, Observable, Scene, Skeleton, Sound, SubMesh, Node, IParticleSystem, AbstractMesh } from '@babylonjs/core';
 import React, { PureComponent } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import Entity from '@/components/Entities/Entity';
 import Assets from '@/components/Assets/Asset';
 import { createStandaloneToast } from '@chakra-ui/toast'
 import { SceneUtils } from './scene/utils';
@@ -15,7 +14,6 @@ import { SceneUtils } from './scene/utils';
 import '@/components/Inspectors/Scene/SceneInspector';
 
 import styles from './index.module.css';
-import Entity from '@/components/Entities/Entity';
 
 const { ToastContainer } = createStandaloneToast()
 
@@ -124,7 +122,7 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
 
     return (
       <>
-        <Flex
+        <Box
           pos="fixed"
           left={0}
           top={0}
@@ -132,15 +130,15 @@ export default class Editor extends PureComponent<IEditorProps, IEditorStates> {
           h="200vh"
           bg="gray.800"
           color="gray.100"
+          overflow="hidden"
           zIndex={999}
-          overflow="hide"
           hidden={engineLoaded}
         >
           <HStack spacing={2} minW="100vw" h="100vh" justify="center">
             <Spinner size="sm" />
             <Heading as="p" fontSize="md">编辑器初始化中...</Heading>
           </HStack>
-        </Flex>
+        </Box>
         <Box as="main" w="100vw" h="100vh" overflow="hidden">
           <PanelGroup autoSaveId='editor-panel' direction="horizontal">
             <Panel

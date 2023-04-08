@@ -1,5 +1,3 @@
-// app/page.js
-
 import Editor from "@/components/Editor";
 
 // This file maps to the index route (/)

@@ -2,9 +2,7 @@
 const { withSentryConfig } = require("@sentry/nextjs");
 
 const nextConfig = {
-  experimental: {
-    appDir: true,
-  },
+  reactStrictMode: true,
   sentry: {
     disableServerWebpackPlugin: true,
     disableClientWebpackPlugin: true,
@@ -16,3 +14,4 @@ const sentryWebpackPluginOptions = {
 };
 
 module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+

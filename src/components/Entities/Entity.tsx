@@ -1,5 +1,3 @@
-"use client"
-
 import { Box, HStack, IconButton, Input, InputGroup, InputLeftElement, Menu, MenuButton, MenuItem, MenuList, Stack } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";
 import Editor from "../Editor";

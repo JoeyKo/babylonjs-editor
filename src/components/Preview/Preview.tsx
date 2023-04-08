@@ -1,11 +1,9 @@
-"use client";
-
 import { createRef, PureComponent, ReactNode } from "react"
 import { Engine, Scene, HemisphericLight, Vector3, ArcRotateCamera, CreateBox, Observable } from '@babylonjs/core';
 import Editor from "../Editor";
 import { Box } from "@chakra-ui/react";
 import Toolbar from "./components/Toolbar";
-import styles from './index.module.scss';
+import styles from './index.module.css';
 import { ScenePicker } from "../Editor/scene/picker";
 import { GizmoType, SceneGizmo } from "../Editor/scene/gizmo";
 import { Nullable } from "@/utils/types";

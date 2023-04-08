@@ -1,5 +1,3 @@
-"use client";
-
 import Editor from "@/components/Editor";
 import { Nullable } from "@/utils/types";
 import {

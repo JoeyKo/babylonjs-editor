@@ -1,5 +1,3 @@
-"use client"
-
 import { PickingInfo, Scene, SceneLoader, Vector3, SceneSerializer, AbstractMesh } from "@babylonjs/core";
 import { Box, Heading, HStack, Icon, Stack, Wrap, WrapItem } from "@chakra-ui/react";
 import { PureComponent, ReactNode } from "react";

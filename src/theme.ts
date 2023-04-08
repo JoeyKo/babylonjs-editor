@@ -1,5 +1,5 @@
 // 1. import `extendTheme` function
-import { extendTheme, withDefaultColorScheme, withDefaultProps, type ThemeConfig } from '@chakra-ui/react'
+import { extendTheme, withDefaultProps, type ThemeConfig } from '@chakra-ui/react'
 
 // 2. Add your color mode config
 const config: ThemeConfig = {
@@ -7,10 +7,20 @@ const config: ThemeConfig = {
   useSystemColorMode: false,
 }
 
+const styles = {
+  global: {
+    'html, body': {
+      bg: 'gray.800',
+      color: 'gray.50',
+    },
+  },
+}
+
 // 3. extend the theme
 const theme = extendTheme(
   {
     config,
+    styles
   },
   // withDefaultColorScheme({ colorScheme: 'blue' }),
   withDefaultProps({
